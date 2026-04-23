@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 
 // Pages
 import Login from './pages/Login';
+import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Room from './pages/Room';
 import Student from './pages/Student';

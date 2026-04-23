@@ -11,10 +11,12 @@ import {
   Menu,
   X,
   Hotel,
+  HomeIcon,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
+  { to: '/home',           label: 'Home',           icon: HomeIcon},
   { to: '/dashboard',      label: 'Dashboard',      icon: LayoutDashboard },
   { to: '/rooms',          label: 'Rooms',          icon: BedDouble },
   { to: '/students',       label: 'Students',       icon: Users },
