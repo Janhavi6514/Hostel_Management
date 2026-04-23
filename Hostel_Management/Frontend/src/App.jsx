@@ -69,6 +69,15 @@ const AppRoutes = () => {
 
       {/* Protected */}
       <Route
+        path="/home"
+        element={
+          <ProtectedRoute>
+             <Home />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/dashboard"
         element={
           <ProtectedRoute>
