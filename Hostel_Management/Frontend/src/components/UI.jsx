@@ -56,36 +56,42 @@ export const Badge = ({ status, label }) => {
 // ─────────────────────────────────────────
 // MODAL
 // ─────────────────────────────────────────
+// ─────────────────────────────────────────
+// MODAL (FIXED - SMALL & CLEAN)
+// ─────────────────────────────────────────
 export const Modal = ({ isOpen, onClose, title, children, footer }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] flex flex-col fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+
+      {/* SMALL MODAL */}
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 flex flex-col">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <h2 className="text-lg font-semibold text-slate-800">{title}</h2>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+          <h2 className="text-sm font-semibold text-slate-800">{title}</h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+            className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
         {/* Body */}
-        <div className="overflow-y-auto flex-1 px-6 py-5 space-y-4">
+        <div className="px-4 py-3 text-sm space-y-2">
           {children}
         </div>
 
         {/* Footer */}
         {footer && (
-          <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-100">
+          <div className="flex justify-end gap-2 px-4 py-3 border-t border-slate-100">
             {footer}
           </div>
         )}
       </div>
+
     </div>
   );
 };

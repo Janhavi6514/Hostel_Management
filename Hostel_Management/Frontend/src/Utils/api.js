@@ -11,10 +11,14 @@ const api = axios.create({
 // Attach JWT token to every request automatically
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token =
+      localStorage.getItem('token') ||
+      localStorage.getItem('hostel_token');
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -45,12 +49,15 @@ export const authAPI = {
 // ─────────────────────────────────────────
 // DASHBOARD
 // ─────────────────────────────────────────
+// ─────────────────────────────────────────
+// DASHBOARD (FIXED ROUTES)
+// ─────────────────────────────────────────
 export const dashboardAPI = {
   getSummary: () => api.get('/dashboard/summary'),
   getMonthlyRevenue: () => api.get('/dashboard/revenue'),
   getRoomOccupancy: () => api.get('/dashboard/occupancy'),
-  getRecentActivity: () => api.get('/dashboard/recent-activity'),
-  getComplaintStats: () => api.get('/dashboard/complaint-stats'),
+  getRecentActivity: () => api.get('/dashboard/recent-activity'),   // ✅ correct
+  getComplaintStats: () => api.get('/dashboard/complaint-stats'),   // ✅ correct
 };
 
 // ─────────────────────────────────────────
@@ -90,6 +97,7 @@ export const feeAPI = {
   markAsPaid: (id, data) => api.put(`/fees/${id}/pay`, data),
   delete: (id) => api.delete(`/fees/${id}`),
   checkOverdue: () => api.get('/fees/check-overdue'),
+  getFees: () => axios.get('/fees'),
 };
 
 // ─────────────────────────────────────────
