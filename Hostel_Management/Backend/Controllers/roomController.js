@@ -1,9 +1,9 @@
 const db = require('../config/database');
 
-// Get all rooms with optional filters
+// GET ALL ROOMS
 const getAllRooms = async (req, res) => {
   try {
-    const { status, type } = req.query;
+    const { status, type, gender } = req.query;
 
     let query = 'SELECT * FROM rooms WHERE 1=1';
     const params = [];
@@ -18,22 +18,28 @@ const getAllRooms = async (req, res) => {
       params.push(type);
     }
 
+    if (gender) {
+      query += ' AND gender = ?';
+      params.push(gender);
+    }
+
     query += ' ORDER BY room_number ASC';
 
     const [rows] = await db.query(query, params);
     res.json(rows);
   } catch (error) {
     console.error('Get rooms error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Get single room by ID
+// GET ROOM BY ID
 const getRoomById = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const [rows] = await db.query('SELECT * FROM rooms WHERE id = ?', [id]);
+    const [rows] = await db.query(
+      'SELECT * FROM rooms WHERE id = ?',
+      [req.params.id]
+    );
 
     if (rows.length === 0) {
       return res.status(404).json({ message: 'Room not found' });
@@ -41,34 +47,33 @@ const getRoomById = async (req, res) => {
 
     res.json(rows[0]);
   } catch (error) {
-    console.error('Get room error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Get students currently allocated to a room
+// GET ROOM STUDENTS
 const getRoomStudents = async (req, res) => {
   try {
-    const { id } = req.params;
-
     const [rows] = await db.query(
       `SELECT s.*, a.check_in, a.check_out, a.id AS allocation_id
        FROM allocations a
        JOIN students s ON a.student_id = s.id
        WHERE a.room_id = ? AND a.status = 'active'`,
-      [id]
+      [req.params.id]
     );
 
     res.json(rows);
   } catch (error) {
-    console.error('Get room students error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Create a new room
+
+// CREATE ROOM
 const createRoom = async (req, res) => {
   try {
+    console.log("REQ BODY:", req.body); // ✅ DEBUG
+
     const {
       room_number,
       type,
@@ -76,30 +81,33 @@ const createRoom = async (req, res) => {
       floor,
       price_per_month,
       status,
+      gender,
       amenities,
       description,
     } = req.body;
 
-    if (!room_number || !capacity || !price_per_month) {
+    // ✅ VALIDATION
+    if (!room_number || !capacity || !price_per_month || !gender) {
       return res.status(400).json({
-        message: 'Room number, capacity, and price are required',
+        message: 'Room number, capacity, price and gender required',
       });
     }
 
-    // Check if room number already exists
     const [existing] = await db.query(
       'SELECT id FROM rooms WHERE room_number = ?',
       [room_number]
     );
 
     if (existing.length > 0) {
-      return res.status(409).json({ message: 'Room number already exists' });
+      return res.status(409).json({
+        message: 'Room number already exists',
+      });
     }
 
     const [result] = await db.query(
       `INSERT INTO rooms
-        (room_number, type, capacity, floor, price_per_month, status, amenities, description)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      (room_number, type, capacity, floor, price_per_month, status, gender, amenities, description)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         room_number,
         type || 'Single',
@@ -107,25 +115,27 @@ const createRoom = async (req, res) => {
         floor || 1,
         price_per_month,
         status || 'available',
+        gender.toLowerCase(),   // ✅ FIXED
         amenities || null,
         description || null,
       ]
     );
 
     res.status(201).json({
-      message: 'Room created successfully',
-      roomId: result.insertId,
+      message: 'Room created',
+      id: result.insertId,
     });
+
   } catch (error) {
-    console.error('Create room error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Update room details
+
+// UPDATE ROOM
 const updateRoom = async (req, res) => {
   try {
-    const { id } = req.params;
     const {
       room_number,
       type,
@@ -133,150 +143,204 @@ const updateRoom = async (req, res) => {
       floor,
       price_per_month,
       status,
+      gender,
       amenities,
       description,
     } = req.body;
 
-    const [existing] = await db.query('SELECT id FROM rooms WHERE id = ?', [id]);
-    if (existing.length === 0) {
-      return res.status(404).json({ message: 'Room not found' });
-    }
-
     await db.query(
       `UPDATE rooms SET
-        room_number   = COALESCE(?, room_number),
-        type          = COALESCE(?, type),
-        capacity      = COALESCE(?, capacity),
-        floor         = COALESCE(?, floor),
+        room_number = COALESCE(?, room_number),
+        type = COALESCE(?, type),
+        capacity = COALESCE(?, capacity),
+        floor = COALESCE(?, floor),
         price_per_month = COALESCE(?, price_per_month),
-        status        = COALESCE(?, status),
-        amenities     = COALESCE(?, amenities),
-        description   = COALESCE(?, description),
-        updated_at    = NOW()
+        status = COALESCE(?, status),
+        gender = COALESCE(LOWER(?), gender),  -- ✅ FIXED
+        amenities = COALESCE(?, amenities),
+        description = COALESCE(?, description),
+        updated_at = NOW()
        WHERE id = ?`,
-      [room_number, type, capacity, floor, price_per_month, status, amenities, description, id]
+      [
+        room_number,
+        type,
+        capacity,
+        floor,
+        price_per_month,
+        status,
+        gender,
+        amenities,
+        description,
+        req.params.id,
+      ]
     );
 
-    res.json({ message: 'Room updated successfully' });
+    res.json({ message: 'Room updated' });
+
   } catch (error) {
-    console.error('Update room error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Delete a room
+// DELETE ROOM
 const deleteRoom = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const [existing] = await db.query('SELECT id FROM rooms WHERE id = ?', [id]);
-    if (existing.length === 0) {
-      return res.status(404).json({ message: 'Room not found' });
-    }
-
-    // Check if room has active allocations
     const [active] = await db.query(
       "SELECT id FROM allocations WHERE room_id = ? AND status = 'active'",
-      [id]
+      [req.params.id]
     );
 
     if (active.length > 0) {
       return res.status(400).json({
-        message: 'Cannot delete room with active student allocations',
+        message: 'Room has active students',
       });
     }
 
-    await db.query('DELETE FROM rooms WHERE id = ?', [id]);
-    res.json({ message: 'Room deleted successfully' });
+    await db.query(
+      'DELETE FROM rooms WHERE id = ?',
+      [req.params.id]
+    );
+
+    res.json({ message: 'Room deleted' });
   } catch (error) {
-    console.error('Delete room error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Allocate a student to a room
+// 🚀 SMART ALLOCATION
 const allocateRoom = async (req, res) => {
   try {
     const { student_id, room_id, check_in, check_out } = req.body;
 
-    if (!student_id || !room_id || !check_in) {
+    if (!student_id || !check_in) {
       return res.status(400).json({
-        message: 'Student ID, room ID, and check-in date are required',
+        message: 'Student ID and check-in required',
       });
     }
 
-    // Check room availability
-    const [room] = await db.query(
-      "SELECT * FROM rooms WHERE id = ? AND status = 'available'",
-      [room_id]
-    );
-
-    if (room.length === 0) {
-      return res.status(400).json({ message: 'Room is not available' });
-    }
-
-    // Check if student already has an active allocation
-    const [existingAlloc] = await db.query(
-      "SELECT id FROM allocations WHERE student_id = ? AND status = 'active'",
+    // GET STUDENT
+    const [studentRows] = await db.query(
+      "SELECT * FROM students WHERE id = ?",
       [student_id]
     );
 
-    if (existingAlloc.length > 0) {
+    if (studentRows.length === 0) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    const student = studentRows[0];
+
+    // 🔹 MANUAL ROOM
+    if (room_id) {
+      const [roomRows] = await db.query(
+        "SELECT * FROM rooms WHERE id = ?",
+        [room_id]
+      );
+
+      if (roomRows.length === 0) {
+        return res.status(404).json({ message: 'Room not found' });
+      }
+
+      const room = roomRows[0];
+
+      if (room.gender !== student.gender) {
+        return res.status(400).json({
+          message: 'Gender mismatch',
+        });
+      }
+
+      const [[{ count }]] = await db.query(
+        "SELECT COUNT(*) as count FROM allocations WHERE room_id = ? AND status='active'",
+        [room_id]
+      );
+
+      if (count >= room.capacity) {
+        return res.status(400).json({
+          message: 'Room full',
+        });
+      }
+
+      await db.query(
+        `INSERT INTO allocations (student_id, room_id, check_in, check_out, status)
+         VALUES (?, ?, ?, ?, 'active')`,
+        [student_id, room_id, check_in, check_out || null]
+      );
+
+      return res.json({ message: 'Allocated manually' });
+    }
+
+    // 🔥 AUTO ALLOCATION
+    const [rooms] = await db.query(
+      `SELECT r.*, 
+        (SELECT COUNT(*) FROM allocations a 
+         WHERE a.room_id = r.id AND a.status='active') AS occupied
+       FROM rooms r
+       WHERE r.gender = ?
+       HAVING occupied < capacity
+       ORDER BY occupied ASC, price_per_month ASC`,
+      [student.gender]
+    );
+
+    if (rooms.length === 0) {
       return res.status(400).json({
-        message: 'Student already has an active room allocation',
+        message: 'No available rooms',
       });
     }
 
-    // Create allocation
+    const room = rooms[0];
+
     await db.query(
       `INSERT INTO allocations (student_id, room_id, check_in, check_out, status)
        VALUES (?, ?, ?, ?, 'active')`,
-      [student_id, room_id, check_in, check_out || null]
+      [student_id, room.id, check_in, check_out || null]
     );
 
-    // Update room status to occupied
-    await db.query(
-      "UPDATE rooms SET status = 'occupied', updated_at = NOW() WHERE id = ?",
-      [room_id]
-    );
+    // UPDATE ROOM STATUS
+    if (room.occupied + 1 >= room.capacity) {
+      await db.query(
+        "UPDATE rooms SET status='occupied' WHERE id=?",
+        [room.id]
+      );
+    }
 
-    res.status(201).json({ message: 'Room allocated successfully' });
+    res.json({
+      message: 'Auto allocated',
+      room: room,
+    });
+
   } catch (error) {
-    console.error('Allocate room error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Vacate a room (end allocation)
+// VACATE ROOM
 const vacateRoom = async (req, res) => {
   try {
-    const { allocation_id } = req.params;
-
     const [alloc] = await db.query(
       'SELECT * FROM allocations WHERE id = ?',
-      [allocation_id]
+      [req.params.allocation_id]
     );
 
     if (alloc.length === 0) {
-      return res.status(404).json({ message: 'Allocation not found' });
+      return res.status(404).json({
+        message: 'Allocation not found',
+      });
     }
 
-    // Mark allocation as vacated
     await db.query(
-      "UPDATE allocations SET status = 'vacated', check_out = CURDATE() WHERE id = ?",
-      [allocation_id]
+      "UPDATE allocations SET status='vacated', check_out=CURDATE() WHERE id=?",
+      [req.params.allocation_id]
     );
 
-    // Set room back to available
     await db.query(
-      "UPDATE rooms SET status = 'available', updated_at = NOW() WHERE id = ?",
+      "UPDATE rooms SET status='available' WHERE id=?",
       [alloc[0].room_id]
     );
 
-    res.json({ message: 'Room vacated successfully' });
+    res.json({ message: 'Room vacated' });
   } catch (error) {
-    console.error('Vacate room error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 

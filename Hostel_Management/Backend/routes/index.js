@@ -72,11 +72,11 @@ router.get('/auth/verify', verifyToken, verifyTokenCtrl);
 // ─────────────────────────────────────────
 // DASHBOARD ROUTES (protected)
 // ─────────────────────────────────────────
-router.get('/dashboard/summary', verifyToken, getSummary);
-router.get('/dashboard/revenue', verifyToken, getMonthlyRevenue);
-router.get('/dashboard/occupancy', verifyToken, getRoomOccupancy);
-router.get('/dashboard/recent-activity', verifyToken, getRecentActivity);
-router.get('/dashboard/complaint-stats', verifyToken, getComplaintStats);
+router.get('/dashboard/summary', getSummary);
+router.get('/dashboard/revenue', getMonthlyRevenue);
+router.get('/dashboard/occupancy', getRoomOccupancy);
+router.get('/dashboard/recent-activity', getRecentActivity);
+router.get('/dashboard/complaint-stats', getComplaintStats);
 
 // ─────────────────────────────────────────
 // STUDENT ROUTES (protected)
@@ -109,7 +109,7 @@ router.get('/fees/:id', verifyToken, getFeeById);
 router.post('/fees', verifyToken, createFee);
 router.put('/fees/:id', verifyToken, updateFee);
 router.put('/fees/:id/pay', verifyToken, markAsPaid);
-router.delete('/fees/:id', verifyToken, isAdmin, deleteFee);
+router.delete('/fees/:id', verifyToken, deleteFee);
 
 // ─────────────────────────────────────────
 // STAFF ROUTES (protected)

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Footer from './Footer';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -9,24 +10,23 @@ import {
   BellRing,
   LogOut,
   Menu,
-  X,
   Hotel,
   HomeIcon,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
-  { to: '/home',           label: 'Home',           icon: HomeIcon},
-  { to: '/dashboard',      label: 'Dashboard',      icon: LayoutDashboard },
-  { to: '/rooms',          label: 'Rooms',          icon: BedDouble },
-  { to: '/students',       label: 'Students',       icon: Users },
-  { to: '/fees',           label: 'Fees',           icon: Wallet },
-  { to: '/complaints',     label: 'Complaints',     icon: MessageSquareWarning },
-  { to: '/staff-notices',  label: 'Staff & Notices',icon: BellRing },
+  { to: '/home', label: 'Home', icon: HomeIcon },
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/rooms', label: 'Rooms', icon: BedDouble },
+  { to: '/students', label: 'Students', icon: Users },
+  { to: '/fees', label: 'Fees', icon: Wallet },
+  { to: '/complaints', label: 'Complaints', icon: MessageSquareWarning },
+  { to: '/staff-notices', label: 'Staff & Notices', icon: BellRing },
 ];
 
 const Layout = ({ children }) => {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -97,30 +97,28 @@ const Layout = ({ children }) => {
   );
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
+    <div className="flex h-screen bg-slate-50"> {/* ✅ removed overflow-hidden */}
 
-      {/* ── Desktop Sidebar ── */}
+      {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-60 bg-white border-r border-slate-100 shrink-0">
         <SidebarContent />
       </aside>
 
-      {/* ── Mobile Sidebar Overlay ── */}
+      {/* Mobile Sidebar */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           />
-          {/* Drawer */}
           <aside className="absolute left-0 top-0 h-full w-60 bg-white shadow-2xl z-50 flex flex-col">
             <SidebarContent />
           </aside>
         </div>
       )}
 
-      {/* ── Main Content ── */}
-      <div className="flex flex-col flex-1 overflow-hidden">
+      {/* Main Content + Footer */}
+      <div className="flex flex-col flex-1"> {/* ✅ removed overflow-hidden */}
 
         {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-100">
@@ -134,7 +132,7 @@ const Layout = ({ children }) => {
             <Hotel size={18} className="text-blue-600" />
             <span className="text-sm font-bold text-slate-800">HostelOS</span>
           </div>
-          <div className="w-9" /> {/* spacer */}
+          <div className="w-9" />
         </header>
 
         {/* Page Content */}
@@ -143,6 +141,10 @@ const Layout = ({ children }) => {
             {children}
           </div>
         </main>
+
+        {/* ✅ Sticky Footer */}
+        <Footer />
+
       </div>
     </div>
   );
