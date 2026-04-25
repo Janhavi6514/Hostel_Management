@@ -8,7 +8,7 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Attach JWT token to every request automatically
+// Attach JWT token
 api.interceptors.request.use(
   (config) => {
     const token =
@@ -24,7 +24,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle 401 (token expired) globally
+// Handle 401
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -49,15 +49,12 @@ export const authAPI = {
 // ─────────────────────────────────────────
 // DASHBOARD
 // ─────────────────────────────────────────
-// ─────────────────────────────────────────
-// DASHBOARD (FIXED ROUTES)
-// ─────────────────────────────────────────
 export const dashboardAPI = {
   getSummary: () => api.get('/dashboard/summary'),
   getMonthlyRevenue: () => api.get('/dashboard/revenue'),
   getRoomOccupancy: () => api.get('/dashboard/occupancy'),
-  getRecentActivity: () => api.get('/dashboard/recent-activity'),   // ✅ correct
-  getComplaintStats: () => api.get('/dashboard/complaint-stats'),   // ✅ correct
+  getRecentActivity: () => api.get('/dashboard/recent-activity'),
+  getComplaintStats: () => api.get('/dashboard/complaint-stats'),
 };
 
 // ─────────────────────────────────────────
@@ -120,11 +117,18 @@ export const noticeAPI = {
 };
 
 // ─────────────────────────────────────────
-// COMPLAINTS
+// COMPLAINTS ✅ FIXED
+// ─────────────────────────────────────────
+// ─────────────────────────────────────────
+// COMPLAINTS ✅ FINAL
 // ─────────────────────────────────────────
 export const complaintAPI = {
   getAll: (params) => api.get('/complaints', { params }),
   create: (data) => api.post('/complaints', data),
+
+  // 🔥 MATCH PATCH ROUTE
+  update: (id, data) => api.patch(`/complaints/${id}`, data),
+
   updateStatus: (id, data) => api.put(`/complaints/${id}/status`, data),
   delete: (id) => api.delete(`/complaints/${id}`),
 };

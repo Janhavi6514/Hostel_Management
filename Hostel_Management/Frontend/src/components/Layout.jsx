@@ -27,7 +27,8 @@ const navItems = [
 const Layout = ({ children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleLogout = () => {
     logout();
@@ -43,7 +44,7 @@ const Layout = ({ children }) => {
           <NavLink
             key={to}
             to={to}
-            onClick={() => setSidebarOpen(false)}
+            onClick={() => window.innerWidth < 768 && setSidebarOpen(false)}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
                 isActive
@@ -91,45 +92,46 @@ const Layout = ({ children }) => {
   return (
     <div className="h-screen flex flex-col bg-slate-50 overflow-hidden">
 
-      {/* Full Top Header */}
-      <header className="h-16 flex items-center justify-between px-6 bg-white border-b border-slate-100 shrink-0">
+      {/* HEADER */}
+      <header className="relative h-16 flex items-center justify-between px-4 md:px-6 bg-white border-b border-slate-100">
 
-        {/* Left */}
-        <div className="flex items-center gap-3">
-          {/* Mobile Menu */}
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="md:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100"
-          >
-            <Menu size={20} />
-          </button>
+        {/* LEFT: Hamburger */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+        >
+          <Menu size={20} />
+        </button>
 
+        {/* CENTER: Logo */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-3">
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
             <Hotel size={20} className="text-white" />
           </div>
 
-          <div>
+          <div className="text-center leading-tight">
             <p className="text-lg font-bold text-slate-800">HostelOS</p>
             <p className="text-xs text-slate-400">Management System</p>
           </div>
         </div>
 
-        {/* Right */}
-        <div className="text-sm text-slate-500">
-          Welcome, {user?.username}
-        </div>
+       
 
       </header>
 
-      {/* Body */}
+      {/* BODY */}
       <div className="flex flex-1 overflow-hidden">
 
-        {/* Desktop Sidebar */}
-        <aside className="hidden md:flex flex-col w-60 bg-white border-r border-slate-100 shrink-0">
+        {/* DESKTOP SIDEBAR */}
+        <aside
+          className={`hidden md:flex flex-col bg-white border-r border-slate-100 transition-all duration-300 ${
+            sidebarOpen ? 'w-60' : 'w-0 overflow-hidden'
+          }`}
+        >
           <SidebarContent />
         </aside>
 
-        {/* Mobile Sidebar */}
+        {/* MOBILE SIDEBAR */}
         {sidebarOpen && (
           <div className="fixed inset-0 z-40 md:hidden">
 
@@ -138,15 +140,15 @@ const Layout = ({ children }) => {
               onClick={() => setSidebarOpen(false)}
             />
 
-            <aside className="absolute left-0 top-16 h-[calc(100%-4rem)] w-60 bg-white shadow-2xl z-50 flex flex-col">
+            <aside className="absolute left-0 top-0 h-full w-60 bg-white shadow-2xl z-50 flex flex-col">
               <SidebarContent />
             </aside>
 
           </div>
         )}
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        {/* MAIN CONTENT */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 transition-all">
           <div className="max-w-7xl mx-auto fade-in">
             {children}
           </div>

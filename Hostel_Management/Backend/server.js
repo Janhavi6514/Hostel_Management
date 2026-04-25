@@ -16,15 +16,18 @@ const PORT = process.env.PORT || 5000;
 // Security headers
 app.use(helmet());
 
-// CORS — allow frontend origin
+// ✅ FIXED CORS (IMPORTANT)
 app.use(
   cors({
     origin: process.env.CLIENT_URL || 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // 🔥 PATCH ADDED
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   })
 );
+
+// ✅ HANDLE PREFLIGHT REQUESTS (VERY IMPORTANT FOR PATCH)
+app.options('*', cors());
 
 // Request logging (dev mode)
 if (process.env.NODE_ENV !== 'production') {

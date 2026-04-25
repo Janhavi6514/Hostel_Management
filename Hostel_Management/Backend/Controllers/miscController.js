@@ -189,6 +189,38 @@ const createComplaint = async (req, res) => {
   }
 };
 
+const updateComplaint = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { student_id, subject, description, category, priority } = req.body;
+
+    const [existing] = await db.query(
+      'SELECT id FROM complaints WHERE id = ?',
+      [id]
+    );
+
+    if (existing.length === 0) {
+      return res.status(404).json({ message: 'Complaint not found' });
+    }
+
+    await db.query(
+      `UPDATE complaints SET
+        student_id = COALESCE(?, student_id),
+        subject = COALESCE(?, subject),
+        description = COALESCE(?, description),
+        category = COALESCE(?, category),
+        priority = COALESCE(?, priority)
+       WHERE id = ?`,
+      [student_id, subject, description, category, priority, id]
+    );
+
+    res.json({ message: 'Complaint updated successfully' });
+  } catch (error) {
+    console.error('Update complaint error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 const updateComplaintStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -244,6 +276,7 @@ module.exports = {
   deleteNotice,
   getAllComplaints,
   createComplaint,
+  updateComplaint, 
   updateComplaintStatus,
   deleteComplaint,
 };

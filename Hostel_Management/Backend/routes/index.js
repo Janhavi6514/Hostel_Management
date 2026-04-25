@@ -58,6 +58,7 @@ const {
   deleteNotice,
   getAllComplaints,
   createComplaint,
+  updateComplaint,              // ✅ ADDED
   updateComplaintStatus,
   deleteComplaint,
 } = require('../Controllers/miscController');
@@ -70,7 +71,7 @@ router.post('/auth/register', verifyToken, isAdmin, register);
 router.get('/auth/verify', verifyToken, verifyTokenCtrl);
 
 // ─────────────────────────────────────────
-// DASHBOARD ROUTES (protected)
+// DASHBOARD ROUTES
 // ─────────────────────────────────────────
 router.get('/dashboard/summary', getSummary);
 router.get('/dashboard/revenue', getMonthlyRevenue);
@@ -79,7 +80,7 @@ router.get('/dashboard/recent-activity', getRecentActivity);
 router.get('/dashboard/complaint-stats', getComplaintStats);
 
 // ─────────────────────────────────────────
-// STUDENT ROUTES (protected)
+// STUDENT ROUTES
 // ─────────────────────────────────────────
 router.get('/students', verifyToken, getAllStudents);
 router.get('/students/:id', verifyToken, getStudentById);
@@ -89,7 +90,7 @@ router.put('/students/:id', verifyToken, updateStudent);
 router.delete('/students/:id', verifyToken, isAdmin, deleteStudent);
 
 // ─────────────────────────────────────────
-// ROOM ROUTES (protected)
+// ROOM ROUTES
 // ─────────────────────────────────────────
 router.get('/rooms', verifyToken, getAllRooms);
 router.get('/rooms/:id', verifyToken, getRoomById);
@@ -101,7 +102,7 @@ router.post('/rooms/allocate', verifyToken, allocateRoom);
 router.put('/rooms/vacate/:allocation_id', verifyToken, vacateRoom);
 
 // ─────────────────────────────────────────
-// FEES ROUTES (protected)
+// FEES ROUTES
 // ─────────────────────────────────────────
 router.get('/fees', verifyToken, getAllFees);
 router.get('/fees/check-overdue', verifyToken, checkOverdueFees);
@@ -112,7 +113,7 @@ router.put('/fees/:id/pay', verifyToken, markAsPaid);
 router.delete('/fees/:id', verifyToken, deleteFee);
 
 // ─────────────────────────────────────────
-// STAFF ROUTES (protected)
+// STAFF ROUTES
 // ─────────────────────────────────────────
 router.get('/staff', verifyToken, getAllStaff);
 router.post('/staff', verifyToken, isAdmin, createStaff);
@@ -120,18 +121,27 @@ router.put('/staff/:id', verifyToken, isAdmin, updateStaff);
 router.delete('/staff/:id', verifyToken, isAdmin, deleteStaff);
 
 // ─────────────────────────────────────────
-// NOTICE ROUTES (protected)
+// NOTICE ROUTES
 // ─────────────────────────────────────────
 router.get('/notices', verifyToken, getAllNotices);
 router.post('/notices', verifyToken, createNotice);
 router.delete('/notices/:id', verifyToken, isAdmin, deleteNotice);
 
 // ─────────────────────────────────────────
-// COMPLAINT ROUTES (protected)
+// COMPLAINT ROUTES
+// ─────────────────────────────────────────
+// ─────────────────────────────────────────
+// COMPLAINT ROUTES (FINAL FIX)
 // ─────────────────────────────────────────
 router.get('/complaints', verifyToken, getAllComplaints);
 router.post('/complaints', verifyToken, createComplaint);
+
+// 🔥 USE PATCH (more reliable)
+router.patch('/complaints/:id', verifyToken, updateComplaint);
+
+// status
 router.put('/complaints/:id/status', verifyToken, updateComplaintStatus);
+
 router.delete('/complaints/:id', verifyToken, isAdmin, deleteComplaint);
 
 module.exports = router;
