@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Plus, UserCheck, Pencil, Trash2, Search } from 'lucide-react';
-import { staffAPI } from '../Utils/api';
+import { Plus, Trash2, Search, UserCheck, Pencil } from 'lucide-react';
+import { staffAPI, noticeAPI } from '../Utils/api';
 import {
   Modal, ConfirmDialog, Spinner,
   EmptyState, Input, Select, Button,
@@ -15,235 +15,314 @@ const defaultStaff = {
   status: 'active',
 };
 
+const typeColors = {
+  general: "bg-blue-500/20 text-blue-400",
+  urgent: "bg-red-500/20 text-red-400",
+  event: "bg-purple-500/20 text-purple-400",
+  maintenance: "bg-yellow-500/20 text-yellow-400",
+};
+
 const StaffAndNotice = () => {
+  const [tab, setTab] = useState('staff');
+
   const [staff, setStaff] = useState([]);
   const [staffLoad, setStaffLoad] = useState(true);
-  const [showStaff, setShowStaff] = useState(false);
-  const [editStaff, setEditStaff] = useState(null);
-  const [staffForm, setStaffForm] = useState(defaultStaff);
+
+  const [notices, setNotices] = useState([]);
+  const [noticeLoad, setNoticeLoad] = useState(true);
 
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState('all');
+
+  const [showStaff, setShowStaff] = useState(false);
+  const [staffForm, setStaffForm] = useState(defaultStaff);
+  const [editStaff, setEditStaff] = useState(null);
+
+  const [showNotice, setShowNotice] = useState(false);
+  const [noticeForm, setNoticeForm] = useState({
+    title: '',
+    content: '',
+    type: 'general',
+  });
 
   const [showConfirm, setConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  const [deleting, setDeleting] = useState(false);
+  const [deleteType, setDeleteType] = useState('');
 
   useEffect(() => {
     fetchStaff();
+    fetchNotices();
   }, []);
 
   const fetchStaff = async () => {
-    try {
-      const res = await staffAPI.getAll();
-      setStaff(res.data);
-    } catch (err) { console.error(err); }
-    finally { setStaffLoad(false); }
+    const res = await staffAPI.getAll();
+    setStaff(res.data);
+    setStaffLoad(false);
   };
 
-  const openCreateStaff = () => {
-    setEditStaff(null);
-    setStaffForm(defaultStaff);
-    setShowStaff(true);
-  };
-
-  const openEditStaff = (s) => {
-    setEditStaff(s);
-    setStaffForm({ ...s });
-    setShowStaff(true);
-  };
-
-  const handleStaffChange = (e) => {
-    setStaffForm({ ...staffForm, [e.target.name]: e.target.value });
+  const fetchNotices = async () => {
+    const res = await noticeAPI.getAll();
+    setNotices(res.data);
+    setNoticeLoad(false);
   };
 
   const handleStaffSave = async () => {
-    if (!staffForm.name || !staffForm.email || !staffForm.role) return;
-
-    try {
-      if (editStaff) {
-        await staffAPI.update(editStaff.id, staffForm);
-      } else {
-        await staffAPI.create(staffForm);
-      }
-      setShowStaff(false);
-      fetchStaff();
-    } catch (err) { console.error(err); }
+    if (editStaff) {
+      await staffAPI.update(editStaff.id, staffForm);
+    } else {
+      await staffAPI.create(staffForm);
+    }
+    setShowStaff(false);
+    setEditStaff(null);
+    setStaffForm(defaultStaff);
+    fetchStaff();
   };
 
-  const confirmDelete = (id) => {
-    setDeleteId(id);
-    setConfirm(true);
+  const handleNoticeSave = async () => {
+    await noticeAPI.create(noticeForm);
+    setShowNotice(false);
+    setNoticeForm({ title: '', content: '', type: 'general' });
+    fetchNotices();
   };
 
   const handleDelete = async () => {
-    setDeleting(true);
-    try {
+    if (deleteType === 'staff') {
       await staffAPI.delete(deleteId);
-      setConfirm(false);
       fetchStaff();
-    } catch (err) { console.error(err); }
-    finally { setDeleting(false); }
+    } else {
+      await noticeAPI.delete(deleteId);
+      fetchNotices();
+    }
+    setConfirm(false);
   };
 
-  // 🔍 FILTER
-  const filteredStaff = staff.filter((s) => {
-    const matchSearch =
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.email.toLowerCase().includes(search.toLowerCase()) ||
-      s.role.toLowerCase().includes(search.toLowerCase());
-
-    const matchFilter =
-      filter === 'all' ||
-      (filter === 'active' && s.status === 'active') ||
-      (filter === 'inactive' && s.status === 'inactive');
-
-    return matchSearch && matchFilter;
-  });
+  const filteredStaff = staff.filter(s =>
+    s.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-white">
 
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Staff Management</h1>
-          <p className="text-sm text-gray-400">Manage hostel staff efficiently</p>
+          <h1 className="text-2xl font-bold">Staff & Notices</h1>
+          <p className="text-slate-400">Manage staff and announcements</p>
         </div>
 
-        <Button onClick={openCreateStaff}>
-          <Plus size={16} /> Add Staff
-        </Button>
+        {tab === 'staff' ? (
+          <Button
+            onClick={() => {
+              setEditStaff(null);
+              setStaffForm(defaultStaff);
+              setShowStaff(true);
+            }}
+          >
+            <Plus size={16}/> Add Staff
+          </Button>
+        ) : (
+          <Button onClick={() => setShowNotice(true)}>
+            <Plus size={16}/> Post Notice
+          </Button>
+        )}
       </div>
 
-      {/* 🔍 SEARCH + FILTER */}
-      <div className="flex gap-4 items-center flex-wrap">
-
-        {/* SEARCH */}
-        <div className="relative w-80">
-          <Search size={18} className="absolute top-3 left-3 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by name, email or role..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border bg-white shadow-sm
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       transition"
-          />
-        </div>
-
-        {/* FILTER */}
-        <div className="flex bg-gray-100 rounded-xl p-1">
-          {['all', 'active', 'inactive'].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-1.5 text-sm rounded-lg capitalize transition ${
-                filter === f ? 'bg-white shadow text-blue-600' : 'text-gray-500'
-              }`}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
-
+      {/* TABS */}
+      <div className="flex bg-slate-800 p-1 rounded-xl w-fit">
+        {['staff','notices'].map(t => (
+          <button
+            key={t}
+            onClick={()=>setTab(t)}
+            className={`px-5 py-2 rounded-lg text-sm ${
+              tab===t
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
+                : 'text-slate-400'
+            }`}
+          >
+            {t}
+          </button>
+        ))}
       </div>
 
-      {/* STAFF LIST */}
-      {staffLoad ? (
-        <Spinner />
-      ) : filteredStaff.length === 0 ? (
-        <EmptyState icon={UserCheck} message="No staff found" />
-      ) : (
-        <div className="grid gap-4">
-          {filteredStaff.map((s) => (
-            <div
-              key={s.id}
-              className="group bg-white p-5 rounded-2xl shadow-sm hover:shadow-lg transition flex justify-between items-center border"
-            >
+      {/* STAFF */}
+      {tab === 'staff' && (
+        <>
+          <div className="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-2 rounded w-80">
+            <Search size={16}/>
+            <input
+              value={search}
+              onChange={(e)=>setSearch(e.target.value)}
+              placeholder="Search staff..."
+              className="bg-transparent outline-none w-full"
+            />
+          </div>
 
-              {/* LEFT */}
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold">
-                  {s.name.charAt(0)}
-                </div>
+          {staffLoad ? <Spinner/> : filteredStaff.length === 0 ? (
+            <EmptyState icon={UserCheck} message="No staff found"/>
+          ) : (
+            <div className="grid gap-4">
+              {filteredStaff.map(s => (
+                <div key={s.id}
+                  className="bg-[#0f172a] border border-slate-800 p-5 rounded-xl flex justify-between items-center"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                      {s.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-semibold">{s.name}</p>
+                      <p className="text-sm text-slate-400">{s.email}</p>
+                    </div>
+                  </div>
 
-                <div>
-                  <p className="font-semibold text-lg">{s.name}</p>
-                  <p className="text-sm text-gray-500">{s.email}</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setEditStaff(s);
+                        setStaffForm(s);
+                        setShowStaff(true);
+                      }}
+                      className="text-yellow-400"
+                    >
+                      <Pencil size={16}/>
+                    </button>
 
-                  <div className="flex gap-2 mt-1">
-                    <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">
-                      {s.role}
-                    </span>
-                    <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
-                      {s.shift}
-                    </span>
+                    <button
+                      onClick={()=>{
+                        setDeleteId(s.id);
+                        setDeleteType('staff');
+                        setConfirm(true);
+                      }}
+                      className="text-red-400"
+                    >
+                      <Trash2 size={16}/>
+                    </button>
                   </div>
                 </div>
-              </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
 
-              {/* RIGHT */}
-              <div className="flex items-center gap-4">
-
-                {/* STATUS BADGE */}
-                <span className={`text-xs font-medium px-3 py-1 rounded-full ${
-                  s.status === 'active'
-                    ? 'bg-green-100 text-green-600'
-                    : 'bg-gray-200 text-gray-500'
-                }`}>
-                  {s.status}
-                </span>
-
-                {/* ACTIONS */}
-                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
-                  <button onClick={() => openEditStaff(s)} className="hover:text-blue-600">
-                    <Pencil size={18} />
-                  </button>
-                  <button onClick={() => confirmDelete(s.id)} className="hover:text-red-500">
-                    <Trash2 size={18} />
-                  </button>
+      {/* NOTICES */}
+      {tab === 'notices' && (
+        <div className="space-y-5">
+          {noticeLoad ? <Spinner/> : notices.map(n => (
+            <div key={n.id}
+              className="bg-[#0f172a] border border-slate-800 rounded-xl p-5"
+            >
+              <div className="flex justify-between">
+                <div>
+                  <h3 className="font-semibold text-lg">{n.title}</h3>
+                  <span className={`text-xs px-2 py-1 rounded ${typeColors[n.type]}`}>
+                    {n.type}
+                  </span>
                 </div>
 
+                <button
+                  onClick={()=>{
+                    setDeleteId(n.id);
+                    setDeleteType('notice');
+                    setConfirm(true);
+                  }}
+                  className="text-red-400"
+                >
+                  <Trash2 size={16}/>
+                </button>
               </div>
+
+              <p className="text-slate-400 mt-2">{n.content}</p>
+              <p className="text-xs text-slate-500 mt-2">
+                {new Date(n.created_at).toLocaleDateString()}
+              </p>
             </div>
           ))}
         </div>
       )}
 
-      {/* MODAL */}
-      <Modal isOpen={showStaff} onClose={() => setShowStaff(false)} title="Staff Details">
-        <div className="space-y-3">
-          <Input name="name" placeholder="Name" value={staffForm.name} onChange={handleStaffChange} />
-          <Input name="email" placeholder="Email" value={staffForm.email} onChange={handleStaffChange} />
-          <Input name="phone" placeholder="Phone" value={staffForm.phone} onChange={handleStaffChange} />
-          <Input name="role" placeholder="Role" value={staffForm.role} onChange={handleStaffChange} />
+      {/* STAFF MODAL (kept using your Modal) */}
+      <Modal isOpen={showStaff} onClose={()=>setShowStaff(false)}>
+        <div className="bg-[#0f172a] p-6 rounded-2xl text-white w-[400px]">
+          <h2 className="text-lg font-semibold mb-3">
+            {editStaff ? "Edit Staff" : "Add Staff"}
+          </h2>
 
-          <Select name="shift" value={staffForm.shift} onChange={handleStaffChange}>
+          <Input placeholder="Name" value={staffForm.name} onChange={(e)=>setStaffForm({...staffForm,name:e.target.value})}/>
+          <Input placeholder="Email" value={staffForm.email} onChange={(e)=>setStaffForm({...staffForm,email:e.target.value})}/>
+          <Input placeholder="Phone" value={staffForm.phone} onChange={(e)=>setStaffForm({...staffForm,phone:e.target.value})}/>
+          <Input placeholder="Role" value={staffForm.role} onChange={(e)=>setStaffForm({...staffForm,role:e.target.value})}/>
+
+          <Select value={staffForm.shift} onChange={(e)=>setStaffForm({...staffForm,shift:e.target.value})}>
             <option>Morning</option>
             <option>Evening</option>
             <option>Night</option>
           </Select>
 
-          <Select name="status" value={staffForm.status} onChange={handleStaffChange}>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </Select>
-
-          <Button onClick={handleStaffSave} className="w-full">
-            Save Changes
-          </Button>
+          <button
+            onClick={handleStaffSave}
+            className="w-full mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 py-2 rounded-lg"
+          >
+            {editStaff ? "Update Staff" : "Add Staff"}
+          </button>
         </div>
       </Modal>
 
+      {/* ✅ CUSTOM NOTICE MODAL (NO WHITE BACKGROUND) */}
+      {showNotice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowNotice(false)}
+          />
+
+          <div className="relative bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 w-[420px] shadow-2xl text-white z-10">
+
+            <div className="flex justify-between mb-4">
+              <h2 className="text-lg font-semibold">Post Notice</h2>
+              <button onClick={()=>setShowNotice(false)}>✕</button>
+            </div>
+
+            <input
+              placeholder="Enter title..."
+              value={noticeForm.title}
+              onChange={(e)=>setNoticeForm({...noticeForm,title:e.target.value})}
+              className="w-full bg-slate-800 border border-slate-700 px-3 py-2 rounded mb-3"
+            />
+
+            <textarea
+              placeholder="Write notice..."
+              value={noticeForm.content}
+              onChange={(e)=>setNoticeForm({...noticeForm,content:e.target.value})}
+              className="w-full bg-slate-800 border border-slate-700 px-3 py-2 rounded mb-3 h-24"
+            />
+
+            <select
+              value={noticeForm.type}
+              onChange={(e)=>setNoticeForm({...noticeForm,type:e.target.value})}
+              className="w-full bg-slate-800 border border-slate-700 px-3 py-2 rounded mb-4"
+            >
+              <option value="general">General</option>
+              <option value="urgent">Urgent</option>
+              <option value="event">Event</option>
+              <option value="maintenance">Maintenance</option>
+            </select>
+
+            <button
+              onClick={handleNoticeSave}
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-2 rounded-lg"
+            >
+              Post Notice
+            </button>
+          </div>
+        </div>
+      )}
+
       <ConfirmDialog
         isOpen={showConfirm}
-        onClose={() => setConfirm(false)}
+        onClose={()=>setConfirm(false)}
         onConfirm={handleDelete}
-        loading={deleting}
       />
-
     </div>
   );
 };

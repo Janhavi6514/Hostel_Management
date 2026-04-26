@@ -20,18 +20,17 @@ const Home = () => {
         }
       };
 
-      // STUDENTS
+      // Students
       const studentsRes = await axios.get("http://localhost:5000/api/students", config);
       const students = studentsRes.data?.data || studentsRes.data || [];
       setTotalStudents(students.length);
 
-      // ROOMS
+      // Rooms
       const roomsRes = await axios.get("http://localhost:5000/api/rooms", config);
       const rooms = roomsRes.data?.data || roomsRes.data || [];
-      const occupied = rooms.filter(r => r.status === "occupied").length;
-      setRoomsOccupied(occupied);
+      setRoomsOccupied(rooms.filter(r => r.status === "occupied").length);
 
-      // FEES
+      // Fees
       const feesRes = await axios.get("http://localhost:5000/api/fees", config);
       const fees = feesRes.data?.data || feesRes.data || [];
 
@@ -41,7 +40,7 @@ const Home = () => {
 
       setPendingFees(pending);
 
-      // COMPLAINTS
+      // Complaints
       const compRes = await axios.get("http://localhost:5000/api/complaints", config);
       const comp = compRes.data?.data || compRes.data || [];
       setComplaints(comp.length);
@@ -56,138 +55,84 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-white">
 
-      {/* 🔷 HEADER */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-2xl shadow-lg">
+      {/* HEADER */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 rounded-2xl shadow-lg">
         <h1 className="text-2xl font-bold">Welcome back 👋</h1>
         <p className="text-sm opacity-90 mt-1">
           Manage hostel operations efficiently
         </p>
       </div>
 
-      {/* 🔷 STATS CARDS */}
+      {/* STATS CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
         {/* Students */}
-        <div className="group rounded-2xl p-[1px] bg-gradient-to-br from-blue-400 to-indigo-500">
-          <div className="bg-white rounded-2xl p-5 shadow transition group-hover:-translate-y-1 group-hover:shadow-xl">
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-500">Total Students</p>
-              <div className="bg-blue-100 p-2 rounded-lg">👨‍🎓</div>
-            </div>
-            <h2 className="text-3xl font-bold text-blue-600 mt-3">
-              {totalStudents}
-            </h2>
-            <p className="text-xs text-gray-400 mt-1">Active + inactive</p>
-          </div>
-        </div>
+        <StatCard
+          title="Total Students"
+          value={totalStudents}
+          icon="👨‍🎓"
+          gradient="from-blue-500 to-indigo-600"
+        />
 
         {/* Rooms */}
-        <div className="group rounded-2xl p-[1px] bg-gradient-to-br from-green-400 to-emerald-500">
-          <div className="bg-white rounded-2xl p-5 shadow transition group-hover:-translate-y-1 group-hover:shadow-xl">
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-500">Rooms Occupied</p>
-              <div className="bg-green-100 p-2 rounded-lg">🛏️</div>
-            </div>
-            <h2 className="text-3xl font-bold text-green-600 mt-3">
-              {roomsOccupied}
-            </h2>
-            <p className="text-xs text-gray-400 mt-1">Currently in use</p>
-          </div>
-        </div>
+        <StatCard
+          title="Rooms Occupied"
+          value={roomsOccupied}
+          icon="🛏️"
+          gradient="from-green-500 to-emerald-600"
+        />
 
         {/* Fees */}
-        <div className="group rounded-2xl p-[1px] bg-gradient-to-br from-yellow-300 to-amber-400">
-          <div className="bg-white rounded-2xl p-5 shadow transition group-hover:-translate-y-1 group-hover:shadow-xl">
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-500">Pending Fees</p>
-              <div className="bg-yellow-100 p-2 rounded-lg">💰</div>
-            </div>
-            <h2 className="text-3xl font-bold text-yellow-600 mt-3">
-              ₹{pendingFees}
-            </h2>
-            <p className="text-xs text-gray-400 mt-1">Awaiting payment</p>
-          </div>
-        </div>
+        <StatCard
+          title="Pending Fees"
+          value={`₹${pendingFees}`}
+          icon="💰"
+          gradient="from-yellow-400 to-amber-500"
+        />
 
         {/* Complaints */}
-        <div className="group rounded-2xl p-[1px] bg-gradient-to-br from-red-400 to-pink-500">
-          <div className="bg-white rounded-2xl p-5 shadow transition group-hover:-translate-y-1 group-hover:shadow-xl">
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-500">Complaints</p>
-              <div className="bg-red-100 p-2 rounded-lg">⚠️</div>
-            </div>
-            <h2 className="text-3xl font-bold text-red-600 mt-3">
-              {complaints}
-            </h2>
-            <p className="text-xs text-gray-400 mt-1">Active issues</p>
-          </div>
-        </div>
+        <StatCard
+          title="Complaints"
+          value={complaints}
+          icon="⚠️"
+          gradient="from-red-500 to-pink-500"
+        />
 
       </div>
 
-      {/* 🔷 QUICK ACTIONS */}
+      {/* QUICK ACTIONS */}
       <div>
-        <h2 className="text-lg font-semibold text-slate-800 mb-4">
+        <h2 className="text-lg font-semibold text-slate-200 mb-4">
           Quick Actions
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
-          {/* Students */}
-          <div
+          <ActionCard
+            title="Manage Students"
+            desc="Add, update or remove student records"
+            icon="👨‍🎓"
+            gradient="from-blue-500 to-indigo-600"
             onClick={() => navigate("/students")}
-            className="group cursor-pointer rounded-2xl p-[1px] bg-gradient-to-br from-blue-400 to-indigo-500"
-          >
-            <div className="bg-white rounded-2xl p-6 shadow transition group-hover:-translate-y-1 group-hover:shadow-xl">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-slate-800">
-                  Manage Students
-                </h3>
-                <div className="bg-blue-100 p-2 rounded-lg">👨‍🎓</div>
-              </div>
-              <p className="text-sm text-gray-500 mt-2">
-                Add, update or remove student records
-              </p>
-            </div>
-          </div>
+          />
 
-          {/* Rooms */}
-          <div
+          <ActionCard
+            title="View Rooms"
+            desc="Check room availability & allocation"
+            icon="🛏️"
+            gradient="from-green-500 to-emerald-600"
             onClick={() => navigate("/rooms")}
-            className="group cursor-pointer rounded-2xl p-[1px] bg-gradient-to-br from-green-400 to-emerald-500"
-          >
-            <div className="bg-white rounded-2xl p-6 shadow transition group-hover:-translate-y-1 group-hover:shadow-xl">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-slate-800">
-                  View Rooms
-                </h3>
-                <div className="bg-green-100 p-2 rounded-lg">🛏️</div>
-              </div>
-              <p className="text-sm text-gray-500 mt-2">
-                Check room availability & allocation
-              </p>
-            </div>
-          </div>
+          />
 
-          {/* Fees */}
-          <div
+          <ActionCard
+            title="Track Fees"
+            desc="Monitor fee payments and dues"
+            icon="💰"
+            gradient="from-yellow-400 to-amber-500"
             onClick={() => navigate("/fees")}
-            className="group cursor-pointer rounded-2xl p-[1px] bg-gradient-to-br from-yellow-300 to-amber-400"
-          >
-            <div className="bg-white rounded-2xl p-6 shadow transition group-hover:-translate-y-1 group-hover:shadow-xl">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-slate-800">
-                  Track Fees
-                </h3>
-                <div className="bg-yellow-100 p-2 rounded-lg">💰</div>
-              </div>
-              <p className="text-sm text-gray-500 mt-2">
-                Monitor fee payments and dues
-              </p>
-            </div>
-          </div>
+          />
 
         </div>
       </div>
@@ -195,4 +140,56 @@ const Home = () => {
     </div>
   );
 };
+
 export default Home;
+
+
+
+
+
+/* ================= STAT CARD ================= */
+const StatCard = ({ title, value, icon, gradient }) => {
+  return (
+    <div className={`rounded-2xl p-[1px] bg-gradient-to-br ${gradient}`}>
+      <div className="bg-[#0f172a] rounded-2xl p-5 shadow hover:-translate-y-1 hover:shadow-xl transition">
+        <div className="flex justify-between items-center">
+          <p className="text-sm text-slate-400">{title}</p>
+          <div className="bg-white/10 p-2 rounded-lg">{icon}</div>
+        </div>
+
+        <h2 className="text-3xl font-bold mt-3 text-white">
+          {value}
+        </h2>
+
+        <p className="text-xs text-slate-500 mt-1">
+          Updated data
+        </p>
+      </div>
+    </div>
+  );
+};
+
+
+
+
+
+/* ================= ACTION CARD ================= */
+const ActionCard = ({ title, desc, icon, gradient, onClick }) => {
+  return (
+    <div
+      onClick={onClick}
+      className={`cursor-pointer rounded-2xl p-[1px] bg-gradient-to-br ${gradient}`}
+    >
+      <div className="bg-[#0f172a] rounded-2xl p-6 shadow hover:-translate-y-1 hover:shadow-xl transition">
+        <div className="flex justify-between items-center">
+          <h3 className="font-semibold text-white">{title}</h3>
+          <div className="bg-white/10 p-2 rounded-lg">{icon}</div>
+        </div>
+
+        <p className="text-sm text-slate-400 mt-2">
+          {desc}
+        </p>
+      </div>
+    </div>
+  );
+};

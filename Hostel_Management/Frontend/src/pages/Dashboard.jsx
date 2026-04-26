@@ -68,7 +68,6 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  // ===== DATA =====
   const totalRevenue = fees
     .filter(f => f.status === 'paid')
     .reduce((sum, f) => sum + Number(f.amount || 0), 0);
@@ -98,26 +97,6 @@ const Dashboard = () => {
   const GENDER_COLORS = ['#6366f1', '#ec4899'];
   const COMPLAINT_COLORS = ['#ef4444', '#facc15', '#22c55e'];
 
-  const renderLabel = ({ cx, cy, midAngle, outerRadius, percent }) => {
-    const RADIAN = Math.PI / 180;
-    const radius = outerRadius + 15;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="#334155"
-        textAnchor={x > cx ? 'start' : 'end'}
-        dominantBaseline="central"
-        style={{ fontSize: 12, fontWeight: 600 }}
-      >
-        {(percent * 100).toFixed(0)}%
-      </text>
-    );
-  };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
@@ -127,11 +106,11 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 text-white">
 
-      <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
+      <h1 className="text-2xl font-bold">Dashboard</h1>
 
-      {/* 🔥 PROFESSIONAL CARDS */}
+      {/* CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
         <Card title="Students" value={students.length} icon={Users} color="blue" />
         <Card title="Rooms" value={summary.totalRooms || 0} icon={BedDouble} color="purple" />
@@ -144,20 +123,20 @@ const Dashboard = () => {
       {/* TOP CHARTS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <div className="lg:col-span-2 bg-white p-5 rounded-2xl shadow">
-          <h2 className="font-semibold mb-3">Revenue Analytics</h2>
+        <div className="bg-[#0f172a] border border-slate-800 p-5 rounded-2xl shadow">
+          <h2 className="font-semibold mb-3 text-slate-300">Revenue Analytics</h2>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={revenue}>
-              <XAxis dataKey="month" />
-              <YAxis />
+              <XAxis stroke="#94a3b8" dataKey="month" />
+              <YAxis stroke="#94a3b8" />
               <Tooltip />
               <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={3} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl shadow">
-          <h2 className="font-semibold mb-3">Room Occupancy</h2>
+        <div className="bg-[#0f172a] border border-slate-800 p-5 rounded-2xl shadow">
+          <h2 className="font-semibold mb-3 text-slate-300">Room Occupancy</h2>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={occupancy} dataKey="count" outerRadius={90}>
@@ -174,40 +153,38 @@ const Dashboard = () => {
 
       {/* BOTTOM CHARTS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-        <Chart title="Fees Status" data={statusData} colors={COLORS} label={renderLabel} />
-        <Chart title="Students Gender (%)" data={genderData} colors={GENDER_COLORS} label={renderLabel} />
-        <Chart title="Complaints Status" data={complaintData} colors={COMPLAINT_COLORS} label={renderLabel} />
-
+        <Chart title="Fees Status" data={statusData} colors={COLORS} />
+        <Chart title="Students Gender" data={genderData} colors={GENDER_COLORS} />
+        <Chart title="Complaints Status" data={complaintData} colors={COMPLAINT_COLORS} />
       </div>
 
     </div>
   );
 };
 
-// 🔥 PREMIUM CARD
+// DARK CARD
 const Card = ({ title, value, icon: Icon, color }) => {
 
   const styles = {
-    blue: "from-blue-500 to-blue-600 bg-blue-100 text-blue-600",
-    purple: "from-purple-500 to-purple-600 bg-purple-100 text-purple-600",
-    green: "from-green-500 to-green-600 bg-green-100 text-green-600",
-    yellow: "from-yellow-400 to-yellow-500 bg-yellow-100 text-yellow-600",
-    pink: "from-pink-500 to-pink-600 bg-pink-100 text-pink-600",
-    red: "from-red-500 to-red-600 bg-red-100 text-red-600",
+    blue: "from-blue-500 to-blue-600 bg-blue-500/10 text-blue-400",
+    purple: "from-purple-500 to-purple-600 bg-purple-500/10 text-purple-400",
+    green: "from-green-500 to-green-600 bg-green-500/10 text-green-400",
+    yellow: "from-yellow-400 to-yellow-500 bg-yellow-500/10 text-yellow-400",
+    pink: "from-pink-500 to-pink-600 bg-pink-500/10 text-pink-400",
+    red: "from-red-500 to-red-600 bg-red-500/10 text-red-400",
   };
 
   const [gradFrom, gradTo, bg, text] = styles[color].split(" ");
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition p-5 relative overflow-hidden">
+    <div className="bg-[#0f172a] border border-slate-800 rounded-2xl shadow-sm hover:shadow-lg hover:scale-[1.02] transition p-5 relative overflow-hidden">
 
       <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${gradFrom} ${gradTo}`} />
 
       <div className="flex justify-between items-center">
         <div>
-          <p className="text-sm text-slate-500">{title}</p>
-          <h2 className="text-2xl font-bold text-slate-800">{value}</h2>
+          <p className="text-sm text-slate-400">{title}</p>
+          <h2 className="text-2xl font-bold text-white">{value}</h2>
         </div>
 
         <div className={`p-3 rounded-xl ${bg}`}>
@@ -218,13 +195,13 @@ const Card = ({ title, value, icon: Icon, color }) => {
   );
 };
 
-// CHART CARD
-const Chart = ({ title, data, colors, label }) => (
-  <div className="bg-white p-5 rounded-2xl shadow">
-    <h2 className="font-semibold mb-3 text-center">{title}</h2>
+// DARK CHART CARD
+const Chart = ({ title, data, colors }) => (
+  <div className="bg-[#0f172a] border border-slate-800 p-5 rounded-2xl shadow">
+    <h2 className="font-semibold mb-3 text-center text-slate-300">{title}</h2>
     <ResponsiveContainer width="100%" height={260}>
       <PieChart>
-        <Pie data={data} dataKey="value" innerRadius={60} outerRadius={90} label={label}>
+        <Pie data={data} dataKey="value" innerRadius={60} outerRadius={90}>
           {data.map((e, i) => <Cell key={i} fill={colors[i]} />)}
         </Pie>
         <Legend />

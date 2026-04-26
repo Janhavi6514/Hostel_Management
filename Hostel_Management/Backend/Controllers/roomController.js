@@ -68,12 +68,43 @@ const getRoomStudents = async (req, res) => {
   }
 };
 
+// 🔥 NEW: ROOMS WITH STUDENTS + FEES
+const getRoomsWithStudentsAndFees = async (req, res) => {
+  try {
+    const [rooms] = await db.query(`SELECT * FROM rooms`);
+
+    for (let room of rooms) {
+      const [students] = await db.query(`
+        SELECT s.id, s.name
+        FROM allocations a
+        JOIN students s ON a.student_id = s.id
+        WHERE a.room_id = ? AND a.status = 'active'
+      `, [room.id]);
+
+      for (let student of students) {
+        const [fees] = await db.query(`
+          SELECT amount, status
+          FROM fees
+          WHERE student_id = ?
+        `, [student.id]);
+
+        student.fees = fees;
+      }
+
+      room.students = students;
+    }
+
+    res.json(rooms);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 // CREATE ROOM
 const createRoom = async (req, res) => {
   try {
-    console.log("REQ BODY:", req.body); // ✅ DEBUG
-
     const {
       room_number,
       type,
@@ -84,9 +115,13 @@ const createRoom = async (req, res) => {
       gender,
       amenities,
       description,
+
+      // ✅ NEW FIELDS
+      total_fee,
+      paid_fee,
+      pending_fee
     } = req.body;
 
-    // ✅ VALIDATION
     if (!room_number || !capacity || !price_per_month || !gender) {
       return res.status(400).json({
         message: 'Room number, capacity, price and gender required',
@@ -104,10 +139,15 @@ const createRoom = async (req, res) => {
       });
     }
 
+    const total = Number(total_fee) || 0;
+    const paid = Number(paid_fee) || 0;
+    const pending = total - paid;
+
     const [result] = await db.query(
       `INSERT INTO rooms
-      (room_number, type, capacity, floor, price_per_month, status, gender, amenities, description)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (room_number, type, capacity, floor, price_per_month, status, gender, amenities, description,
+       total_fee, paid_fee, pending_fee)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         room_number,
         type || 'Single',
@@ -115,9 +155,12 @@ const createRoom = async (req, res) => {
         floor || 1,
         price_per_month,
         status || 'available',
-        gender.toLowerCase(),   // ✅ FIXED
+        gender.toLowerCase(),
         amenities || null,
         description || null,
+        total,
+        paid,
+        pending
       ]
     );
 
@@ -132,7 +175,6 @@ const createRoom = async (req, res) => {
   }
 };
 
-
 // UPDATE ROOM
 const updateRoom = async (req, res) => {
   try {
@@ -146,7 +188,15 @@ const updateRoom = async (req, res) => {
       gender,
       amenities,
       description,
+
+      // ✅ NEW
+      total_fee,
+      paid_fee
     } = req.body;
+
+    const total = Number(total_fee) || 0;
+    const paid = Number(paid_fee) || 0;
+    const pending = total - paid;
 
     await db.query(
       `UPDATE rooms SET
@@ -156,9 +206,12 @@ const updateRoom = async (req, res) => {
         floor = COALESCE(?, floor),
         price_per_month = COALESCE(?, price_per_month),
         status = COALESCE(?, status),
-        gender = COALESCE(LOWER(?), gender),  -- ✅ FIXED
+        gender = COALESCE(LOWER(?), gender),
         amenities = COALESCE(?, amenities),
         description = COALESCE(?, description),
+        total_fee = ?,
+        paid_fee = ?,
+        pending_fee = ?,
         updated_at = NOW()
        WHERE id = ?`,
       [
@@ -171,6 +224,9 @@ const updateRoom = async (req, res) => {
         gender,
         amenities,
         description,
+        total,
+        paid,
+        pending,
         req.params.id,
       ]
     );
@@ -178,6 +234,7 @@ const updateRoom = async (req, res) => {
     res.json({ message: 'Room updated' });
 
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -207,7 +264,7 @@ const deleteRoom = async (req, res) => {
   }
 };
 
-// 🚀 SMART ALLOCATION
+// ALLOCATE ROOM (UNCHANGED)
 const allocateRoom = async (req, res) => {
   try {
     const { student_id, room_id, check_in, check_out } = req.body;
@@ -218,7 +275,6 @@ const allocateRoom = async (req, res) => {
       });
     }
 
-    // GET STUDENT
     const [studentRows] = await db.query(
       "SELECT * FROM students WHERE id = ?",
       [student_id]
@@ -230,7 +286,6 @@ const allocateRoom = async (req, res) => {
 
     const student = studentRows[0];
 
-    // 🔹 MANUAL ROOM
     if (room_id) {
       const [roomRows] = await db.query(
         "SELECT * FROM rooms WHERE id = ?",
@@ -244,9 +299,7 @@ const allocateRoom = async (req, res) => {
       const room = roomRows[0];
 
       if (room.gender !== student.gender) {
-        return res.status(400).json({
-          message: 'Gender mismatch',
-        });
+        return res.status(400).json({ message: 'Gender mismatch' });
       }
 
       const [[{ count }]] = await db.query(
@@ -255,9 +308,7 @@ const allocateRoom = async (req, res) => {
       );
 
       if (count >= room.capacity) {
-        return res.status(400).json({
-          message: 'Room full',
-        });
+        return res.status(400).json({ message: 'Room full' });
       }
 
       await db.query(
@@ -269,7 +320,6 @@ const allocateRoom = async (req, res) => {
       return res.json({ message: 'Allocated manually' });
     }
 
-    // 🔥 AUTO ALLOCATION
     const [rooms] = await db.query(
       `SELECT r.*, 
         (SELECT COUNT(*) FROM allocations a 
@@ -295,7 +345,6 @@ const allocateRoom = async (req, res) => {
       [student_id, room.id, check_in, check_out || null]
     );
 
-    // UPDATE ROOM STATUS
     if (room.occupied + 1 >= room.capacity) {
       await db.query(
         "UPDATE rooms SET status='occupied' WHERE id=?",
@@ -348,6 +397,7 @@ module.exports = {
   getAllRooms,
   getRoomById,
   getRoomStudents,
+  getRoomsWithStudentsAndFees, // ✅ NEW EXPORT
   createRoom,
   updateRoom,
   deleteRoom,

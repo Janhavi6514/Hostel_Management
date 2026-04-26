@@ -21,10 +21,8 @@ const defaultForm = {
 const normalizeGender = (g) => {
   if (!g) return '';
   const val = g.toLowerCase().trim();
-
   if (val.includes('girl')) return 'girls';
   if (val.includes('boy')) return 'boys';
-
   return val;
 };
 
@@ -57,10 +55,7 @@ const Room = () => {
   }, []);
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const openCreate = () => {
@@ -71,43 +66,35 @@ const Room = () => {
 
   const openEdit = (room) => {
     setEditRoom(room);
-    setForm({
-      ...room,
-      gender: normalizeGender(room.gender)
-    });
+    setForm({ ...room, gender: normalizeGender(room.gender) });
     setShowModal(true);
   };
 
   const handleSave = async () => {
-  console.log("FORM BEFORE:", form);
-
-  if (!form.room_number || !form.capacity || !form.price_per_month || !form.gender) {
-    alert("Fill all required fields");
-    return;
-  }
-
-  try {
-    const payload = {
-      ...form,
-      gender: form.gender === "girls" ? "girls" : "boys"
-    };
-
-    console.log("SENDING TO BACKEND:", payload);
-
-    if (editRoom) {
-      await roomAPI.update(editRoom.id, payload);
-    } else {
-      await roomAPI.create(payload);
+    if (!form.room_number || !form.capacity || !form.price_per_month || !form.gender) {
+      alert("Fill all required fields");
+      return;
     }
 
-    setShowModal(false);
-    fetchRooms();
+    try {
+      const payload = {
+        ...form,
+        gender: form.gender === "girls" ? "girls" : "boys"
+      };
 
-  } catch (err) {
-    console.error(err);
-    alert("Error saving room");
-  }
-};
+      if (editRoom) {
+        await roomAPI.update(editRoom.id, payload);
+      } else {
+        await roomAPI.create(payload);
+      }
+
+      setShowModal(false);
+      fetchRooms();
+    } catch (err) {
+      console.error(err);
+      alert("Error saving room");
+    }
+  };
 
   const handleDelete = async () => {
     await roomAPI.delete(deleteId);
@@ -121,20 +108,20 @@ const Room = () => {
       r.type.toLowerCase().includes(search.toLowerCase());
 
     const matchGender =
-  activeTab === 'all'
-    ? true
-    : normalizeGender(r.gender).includes(activeTab);
+      activeTab === 'all'
+        ? true
+        : normalizeGender(r.gender).includes(activeTab);
 
     return matchSearch && matchGender;
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-white">
 
       {/* HEADER */}
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-slate-800">Rooms</h1>
-        <Button onClick={openCreate}>
+        <h1 className="text-2xl font-bold">Rooms</h1>
+        <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90">
           <Plus size={16}/> Add Room
         </Button>
       </div>
@@ -145,10 +132,10 @@ const Room = () => {
           <button
             key={tab}
             onClick={()=>setActiveTab(tab)}
-            className={`px-4 py-1 rounded-lg text-sm ${
+            className={`px-4 py-1 rounded-lg text-sm transition ${
               activeTab===tab
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
+                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
             }`}
           >
             {tab==='all' ? 'All' : tab==='boys' ? '👦 Boys' : '👧 Girls'}
@@ -161,7 +148,7 @@ const Room = () => {
         value={search}
         onChange={(e)=>setSearch(e.target.value)}
         placeholder="Search rooms..."
-        className="border px-3 py-2 rounded-lg w-full max-w-xs"
+        className="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg w-full max-w-xs text-white focus:ring-2 focus:ring-blue-500 outline-none"
       />
 
       {/* CARDS */}
@@ -173,45 +160,45 @@ const Room = () => {
           {filtered.map(room => (
             <div
               key={room.id}
-              className="bg-white rounded-xl p-4 shadow hover:shadow-lg border"
+              className="bg-[#0f172a] border border-slate-800 rounded-xl p-4 shadow hover:shadow-lg hover:scale-[1.02] transition"
             >
               <div className="flex justify-between mb-2">
-                <h2 className="font-semibold text-sm">
+                <h2 className="font-semibold text-sm text-white">
                   Room {room.room_number}
                 </h2>
 
                 <span className={`text-xs px-2 py-0.5 rounded-full ${
                   normalizeGender(room.gender) === 'boys'
-                    ? 'bg-blue-100 text-blue-600'
-                    : 'bg-pink-100 text-pink-600'
+                    ? 'bg-blue-500/20 text-blue-400'
+                    : 'bg-pink-500/20 text-pink-400'
                 }`}>
                   {normalizeGender(room.gender) === 'boys' ? '👦' : '👧'}
                 </span>
               </div>
 
-              <div className="text-xs text-gray-500 flex justify-between">
+              <div className="text-xs text-slate-400 flex justify-between">
                 <span>Floor {room.floor}</span>
                 <span>{room.capacity} Beds</span>
               </div>
 
-              <p className="text-base font-bold mt-2">
+              <p className="text-lg font-bold mt-2 text-white">
                 ₹{room.price_per_month}
               </p>
 
               <div className="flex gap-2 mt-3">
                 <button
                   onClick={()=>setSelectedRoom(room)}
-                  className="flex-1 bg-blue-100 text-blue-600 text-xs py-1 rounded"
+                  className="flex-1 bg-blue-500/20 text-blue-400 text-xs py-1 rounded hover:bg-blue-500/30"
                 >
                   View
                 </button>
 
-                <button onClick={()=>openEdit(room)}>✏️</button>
+                <button onClick={()=>openEdit(room)} className="text-slate-400 hover:text-white">✏️</button>
 
                 <button onClick={()=>{
                   setDeleteId(room.id);
                   setConfirm(true);
-                }}>
+                }} className="text-red-400 hover:text-red-300">
                   🗑️
                 </button>
               </div>
@@ -221,10 +208,10 @@ const Room = () => {
         </div>
       )}
 
-      {/* ✅ VIEW MODAL */}
+      {/* VIEW MODAL */}
       <Modal isOpen={!!selectedRoom} onClose={()=>setSelectedRoom(null)} title="Room Details">
         {selectedRoom && (
-          <div className="space-y-2 text-sm">
+          <div className="space-y-2 text-sm text-slate-300">
             <p><b>Room:</b> {selectedRoom.room_number}</p>
             <p><b>Type:</b> {selectedRoom.type}</p>
             <p><b>Floor:</b> {selectedRoom.floor}</p>
@@ -241,19 +228,19 @@ const Room = () => {
       <Modal isOpen={showModal} onClose={()=>setShowModal(false)} title="Room">
 
         <FormGroup label="Room Number">
-          <Input name="room_number" value={form.room_number} onChange={handleChange}/>
+          <Input className="bg-slate-800 text-white" name="room_number" value={form.room_number} onChange={handleChange}/>
         </FormGroup>
 
         <FormGroup label="Capacity">
-          <Input type="number" name="capacity" value={form.capacity} onChange={handleChange}/>
+          <Input className="bg-slate-800 text-white" type="number" name="capacity" value={form.capacity} onChange={handleChange}/>
         </FormGroup>
 
         <FormGroup label="Price">
-          <Input type="number" name="price_per_month" value={form.price_per_month} onChange={handleChange}/>
+          <Input className="bg-slate-800 text-white" type="number" name="price_per_month" value={form.price_per_month} onChange={handleChange}/>
         </FormGroup>
 
         <FormGroup label="Gender">
-          <Select name="gender" value={form.gender} onChange={handleChange}>
+          <Select className="bg-slate-800 text-white" name="gender" value={form.gender} onChange={handleChange}>
             <option value="">Select Gender</option>
             <option value="boys">Boys</option>
             <option value="girls">Girls</option>

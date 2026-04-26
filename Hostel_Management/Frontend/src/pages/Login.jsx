@@ -37,112 +37,112 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-[#020617] via-[#020617] to-[#0f172a] flex items-center justify-center px-4">
 
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+      <div className="w-full max-w-sm">
 
-          {/* Top Banner */}
-          <div className="bg-blue-600 px-8 py-8 text-center">
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Hotel size={32} className="text-white" />
+        {/* CARD */}
+        <div className="
+          bg-white/5 backdrop-blur-2xl
+          border border-white/10
+          rounded-2xl shadow-2xl
+          overflow-hidden
+        ">
+
+          {/* HEADER */}
+          <div className="px-6 py-6 text-center border-b border-white/10">
+
+            <div className="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+              <Hotel size={24} className="text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-white">HostelOS</h1>
-            <p className="text-blue-200 text-sm mt-1">Hostel Management System</p>
+
+            <h1 className="text-xl font-semibold text-white">HostelOS</h1>
+            <p className="text-slate-400 text-xs mt-1">Management System</p>
+
           </div>
 
-          {/* Form */}
-          <div className="px-8 py-8">
-            <h2 className="text-lg font-semibold text-slate-800 mb-1">Welcome back</h2>
-            <p className="text-sm text-slate-400 mb-6">Sign in to your admin account</p>
+          {/* FORM */}
+          <div className="px-6 py-6 text-white">
 
-            {/* Error Message */}
+            <h2 className="text-base font-medium mb-1">Sign in</h2>
+            <p className="text-xs text-slate-400 mb-5">Enter your credentials</p>
+
+            {/* ERROR */}
             {error && (
-              <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+              <div className="mb-3 px-3 py-2 bg-red-500/10 border border-red-500/20 rounded text-xs text-red-400">
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
 
-              {/* Username */}
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">
-                  Username <span className="text-red-500">*</span>
-                </label>
+              {/* USERNAME */}
+              <input
+                type="text"
+                name="username"
+                value={form.username}
+                onChange={handleChange}
+                placeholder="Username"
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg
+                           focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+              />
+
+              {/* PASSWORD */}
+              <div className="relative">
                 <input
-                  type="text"
-                  name="username"
-                  value={form.username}
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={form.password}
                   onChange={handleChange}
-                  placeholder="Enter your username"
-                  autoComplete="username"
-                  className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg outline-none
-                             focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                             placeholder-slate-400 transition"
+                  placeholder="Password"
+                  className="w-full px-3 py-2 pr-10 bg-white/5 border border-white/10 rounded-lg
+                             focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                 />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                >
+                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                </button>
               </div>
 
-              {/* Password */}
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">
-                  Password <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    name="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    placeholder="Enter your password"
-                    autoComplete="current-password"
-                    className="w-full px-3 py-2.5 pr-10 text-sm border border-slate-200 rounded-lg outline-none
-                               focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                               placeholder-slate-400 transition"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition"
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Submit */}
+              {/* BUTTON */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700
-                           text-white text-sm font-medium py-2.5 rounded-lg transition-all
-                           disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+                className="w-full flex items-center justify-center gap-2
+                           bg-gradient-to-r from-blue-600 to-indigo-600
+                           hover:opacity-90 text-white text-sm font-medium py-2 rounded-lg transition mt-1"
               >
                 {loading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Signing in...
+                    Signing...
                   </>
                 ) : (
                   <>
-                    <LogIn size={16} />
+                    <LogIn size={14} />
                     Sign In
                   </>
                 )}
               </button>
+
             </form>
 
-            {/* Hint */}
-            <p className="text-xs text-slate-400 text-center mt-6">
-              Default credentials: <span className="font-medium text-slate-500">admin / admin123</span>
+            {/* FOOTER */}
+            <p className="text-[11px] text-slate-500 text-center mt-4">
+              admin / admin123
             </p>
+
           </div>
         </div>
 
-        <p className="text-center text-xs text-slate-400 mt-4">
-          © {new Date().getFullYear()} HostelOS. All rights reserved.
+        <p className="text-center text-[10px] text-slate-600 mt-3">
+          © {new Date().getFullYear()} HostelOS
         </p>
+
       </div>
     </div>
   );

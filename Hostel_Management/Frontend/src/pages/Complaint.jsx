@@ -28,7 +28,6 @@ const Complaint = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [editId, setEditId] = useState(null);
 
-  // FETCH
   const fetchComplaints = async () => {
     try {
       const res = await complaintAPI.getAll(
@@ -103,53 +102,54 @@ const Complaint = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-white">
 
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Complaints</h1>
-          <p className="text-gray-500">Manage and track all complaints</p>
+          <h1 className="text-2xl font-bold text-white">Complaints</h1>
+          <p className="text-slate-400">Manage and track all complaints</p>
         </div>
 
-        <Button onClick={() => {
-          setEditId(null);
-          setForm(defaultForm);
-          setShowModal(true);
-        }}>
+        <Button className="bg-gradient-to-r from-blue-600 to-indigo-600">
           <Plus size={16} /> New
         </Button>
       </div>
 
       {/* SUMMARY */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-gradient-to-r from-yellow-100 to-yellow-50 shadow">
-          Open <div className="text-xl font-bold">{countBy("open")}</div>
+        <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+          <p className="text-yellow-400">Open</p>
+          <div className="text-xl font-bold">{countBy("open")}</div>
         </div>
-        <div className="p-4 rounded-xl bg-gradient-to-r from-blue-100 to-blue-50 shadow">
-          In Progress <div className="text-xl font-bold">{countBy("in_progress")}</div>
+
+        <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+          <p className="text-blue-400">In Progress</p>
+          <div className="text-xl font-bold">{countBy("in_progress")}</div>
         </div>
-        <div className="p-4 rounded-xl bg-gradient-to-r from-green-100 to-green-50 shadow">
-          Resolved <div className="text-xl font-bold">{countBy("resolved")}</div>
+
+        <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20">
+          <p className="text-green-400">Resolved</p>
+          <div className="text-xl font-bold">{countBy("resolved")}</div>
         </div>
       </div>
 
       {/* FILTER */}
       <div className="flex gap-3">
-        <div className="flex items-center gap-2 border px-3 py-2 rounded w-full max-w-xs bg-white shadow-sm">
-          <Search size={16} />
+        <div className="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-2 rounded w-full max-w-xs">
+          <Search size={16} className="text-slate-400" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search complaints..."
-            className="outline-none w-full"
+            className="outline-none w-full bg-transparent text-white"
           />
         </div>
 
         <select
           value={filterStatus}
           onChange={(e) => setFilter(e.target.value)}
-          className="border px-3 py-2 rounded shadow-sm"
+          className="bg-slate-800 border border-slate-700 px-3 py-2 rounded text-white"
         >
           <option value="">All</option>
           <option value="open">Open</option>
@@ -168,8 +168,7 @@ const Complaint = () => {
           {filtered.map((c) => (
             <div
               key={c.id}
-              className={`relative group p-5 rounded-2xl bg-white border shadow-sm
-                hover:shadow-2xl hover:-translate-y-1 transition-all duration-300
+              className={`relative group p-5 rounded-2xl bg-[#0f172a] border border-slate-800 shadow hover:shadow-xl transition
                 border-l-4
                 ${c.status === "open" && "border-l-yellow-400"}
                 ${c.status === "in_progress" && "border-l-blue-500"}
@@ -177,41 +176,35 @@ const Complaint = () => {
               `}
             >
 
-              {/* HEADER */}
-              <div className="flex justify-between items-start mb-3">
+              <div className="flex justify-between mb-3">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition">
+                  <h3 className="text-lg font-semibold text-white">
                     {c.student_name}
                   </h3>
-                  <p className="text-xs text-gray-500">{c.category}</p>
+                  <p className="text-xs text-slate-400">{c.category}</p>
                 </div>
 
-                <span
-                  className={`px-3 py-1 text-xs rounded-full capitalize
-                    ${c.status === "open" && "bg-yellow-100 text-yellow-700"}
-                    ${c.status === "in_progress" && "bg-blue-100 text-blue-700"}
-                    ${c.status === "resolved" && "bg-green-100 text-green-700"}
-                  `}
-                >
+                <span className={`px-3 py-1 text-xs rounded-full capitalize
+                  ${c.status === "open" && "bg-yellow-500/20 text-yellow-400"}
+                  ${c.status === "in_progress" && "bg-blue-500/20 text-blue-400"}
+                  ${c.status === "resolved" && "bg-green-500/20 text-green-400"}
+                `}>
                   {c.status.replace("_", " ")}
                 </span>
               </div>
 
-              {/* SUBJECT */}
-              <h4 className="font-medium text-gray-700">{c.subject}</h4>
+              <h4 className="text-slate-200">{c.subject}</h4>
 
-              {/* DESCRIPTION */}
-              <p className="text-sm text-gray-600 mt-1 mb-4 line-clamp-2">
+              <p className="text-sm text-slate-400 mt-1 mb-4 line-clamp-2">
                 {c.description}
               </p>
 
-              {/* FOOTER */}
               <div className="flex justify-between items-center">
 
                 <select
                   value={c.status}
                   onChange={(e) => updateStatus(c.id, e.target.value)}
-                  className="px-2 py-1 border rounded-lg text-sm focus:ring-2 focus:ring-blue-400"
+                  className="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-sm"
                 >
                   <option value="open">Open</option>
                   <option value="in_progress">In Progress</option>
@@ -221,7 +214,7 @@ const Complaint = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEdit(c)}
-                    className="p-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 hover:scale-110 transition"
+                    className="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:scale-110"
                   >
                     <Pencil size={16} />
                   </button>
@@ -231,15 +224,13 @@ const Complaint = () => {
                       setDeleteId(c.id);
                       setConfirm(true);
                     }}
-                    className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 hover:scale-110 transition"
+                    className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:scale-110"
                   >
                     <Trash2 size={16} />
                   </button>
                 </div>
               </div>
 
-              {/* HOVER GLOW */}
-              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 bg-gradient-to-r from-blue-100/20 to-purple-100/20 transition pointer-events-none"></div>
             </div>
           ))}
         </div>
@@ -250,14 +241,6 @@ const Complaint = () => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         title={editId ? "Edit Complaint" : "New Complaint"}
-        footer={
-          <>
-            <Button type="button" onClick={() => setShowModal(false)}>Cancel</Button>
-            <Button type="button" onClick={handleSave}>
-              {editId ? "Update" : "Submit"}
-            </Button>
-          </>
-        }
       >
         <FormGroup label="Student">
           <Select name="student_id" value={form.student_id} onChange={handleChange}>
@@ -269,7 +252,7 @@ const Complaint = () => {
         </FormGroup>
 
         <FormGroup label="Subject">
-          <Input name="subject" value={form.subject} onChange={handleChange} />
+          <Input className="bg-slate-800 text-white" name="subject" value={form.subject} onChange={handleChange} />
         </FormGroup>
 
         <FormGroup label="Description">
@@ -277,17 +260,19 @@ const Complaint = () => {
             name="description"
             value={form.description}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full bg-slate-800 border border-slate-700 p-2 rounded text-white"
           />
         </FormGroup>
+
+        <Button onClick={handleSave}>
+          {editId ? "Update" : "Submit"}
+        </Button>
       </Modal>
 
       <ConfirmDialog
         isOpen={showConfirm}
         onClose={() => setConfirm(false)}
         onConfirm={handleDelete}
-        title="Delete Complaint"
-        message="Are you sure?"
       />
 
     </div>
