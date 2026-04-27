@@ -29,6 +29,7 @@ const Layout = ({ children }) => {
   const navigate = useNavigate();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showProfile, setShowProfile] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -53,31 +54,24 @@ const Layout = ({ children }) => {
               }`
             }
           >
-            <Icon
-              size={18}
-              className="transition-transform duration-300 group-hover:scale-110"
-            />
-
-            {sidebarOpen && (
-              <span className="whitespace-nowrap">{label}</span>
-            )}
+            <Icon size={18} />
+            {sidebarOpen && <span>{label}</span>}
           </NavLink>
         ))}
       </nav>
 
       {/* USER SECTION */}
       <div className="px-3 py-4 border-t border-slate-800">
-
-        <div className="flex items-center gap-3 px-3 py-2 mb-3 rounded-xl hover:bg-slate-800 transition">
-          <div className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow">
+        <div className="flex items-center gap-3 px-3 py-2 mb-3 rounded-xl hover:bg-slate-800">
+          <div className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
             <span className="text-sm font-semibold text-white">
               {user?.username?.charAt(0).toUpperCase()}
             </span>
           </div>
 
           {sidebarOpen && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white truncate">
+            <div>
+              <p className="text-sm font-semibold text-white">
                 {user?.username}
               </p>
               <p className="text-xs text-slate-400 capitalize">
@@ -89,7 +83,7 @@ const Layout = ({ children }) => {
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition-all"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10"
         >
           <LogOut size={18} />
           {sidebarOpen && "Logout"}
@@ -101,45 +95,38 @@ const Layout = ({ children }) => {
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-[#020617] via-[#020617] to-[#0f172a] text-white overflow-hidden">
 
-      {/*HEADER */}
+      {/* HEADER */}
       <header className="relative h-16 flex items-center justify-between px-4 md:px-6 
       bg-gradient-to-r from-[#0f172a] via-[#020617] to-[#0f172a] 
-      border-b border-slate-800 backdrop-blur-lg shadow-sm">
+      border-b border-slate-800">
 
         {/* MENU */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition"
+          className="p-2 rounded-lg text-slate-300 hover:bg-slate-800"
         >
           <Menu size={20} />
         </button>
 
         {/* LOGO */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-3 group cursor-pointer">
-
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition">
-            <Hotel size={20} className="text-white" />
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+            <Hotel size={20} />
           </div>
 
-          <div className="text-center leading-tight">
-            <p className="text-lg font-bold tracking-wide group-hover:text-blue-400 transition">
-              HostelOS
-            </p>
-            <p className="text-xs text-slate-400">
-              Management System
-            </p>
+          <div className="text-center">
+            <p className="text-lg font-bold">HostelOS</p>
+            <p className="text-xs text-slate-400">Management System</p>
           </div>
         </div>
 
-        {/* RIGHT SIDE */}
-        <div className="flex items-center gap-3">
+        {/* RIGHT SIDE (ONLY PROFILE ICON) */}
+        <div className="relative">
 
-          <div className="relative p-2 rounded-lg hover:bg-slate-800 cursor-pointer">
-            <BellRing size={18} className="text-slate-300" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-          </div>
-
-          <div className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-slate-800 cursor-pointer">
+          <div
+            onClick={() => setShowProfile(!showProfile)}
+            className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-slate-800 cursor-pointer"
+          >
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
               <span className="text-xs font-semibold text-white">
                 {user?.username?.charAt(0).toUpperCase()}
@@ -151,6 +138,23 @@ const Layout = ({ children }) => {
             </span>
           </div>
 
+          {/* DROPDOWN (ONLY LOGOUT) */}
+          {showProfile && (
+            <div className="absolute right-0 mt-2 w-36 bg-[#0f172a] border border-slate-700 rounded-lg shadow-lg p-2 z-50">
+
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setShowProfile(false);
+                }}
+                className="block w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/20 rounded"
+              >
+                Logout
+              </button>
+
+            </div>
+          )}
+
         </div>
 
       </header>
@@ -159,14 +163,14 @@ const Layout = ({ children }) => {
 
         {/* SIDEBAR */}
         <aside
-          className={`hidden md:flex flex-col bg-[#020617] border-r border-slate-800 transition-all duration-300 ${
+          className={`hidden md:flex flex-col bg-[#020617] border-r border-slate-800 ${
             sidebarOpen ? 'w-60' : 'w-20'
           }`}
         >
           <SidebarContent />
         </aside>
 
-        {/* MOBILE */}
+        {/* MOBILE SIDEBAR */}
         {sidebarOpen && (
           <div className="fixed inset-0 z-40 md:hidden">
             <div

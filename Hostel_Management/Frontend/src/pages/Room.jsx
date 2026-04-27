@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, BedDouble } from 'lucide-react';
+import { Plus, BedDouble, Pencil, Trash2 } from 'lucide-react';
 import { roomAPI } from '../Utils/api';
 import {
   Modal, ConfirmDialog, Spinner,
@@ -14,8 +14,6 @@ const defaultForm = {
   price_per_month: '',
   status: 'available',
   gender: '',
-  amenities: '',
-  description: '',
 };
 
 const normalizeGender = (g) => {
@@ -32,7 +30,6 @@ const Room = () => {
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('all');
 
-  const [selectedRoom, setSelectedRoom] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showConfirm, setConfirm] = useState(false);
 
@@ -77,15 +74,10 @@ const Room = () => {
     }
 
     try {
-      const payload = {
-        ...form,
-        gender: form.gender === "girls" ? "girls" : "boys"
-      };
-
       if (editRoom) {
-        await roomAPI.update(editRoom.id, payload);
+        await roomAPI.update(editRoom.id, form);
       } else {
-        await roomAPI.create(payload);
+        await roomAPI.create(form);
       }
 
       setShowModal(false);
@@ -105,7 +97,7 @@ const Room = () => {
   const filtered = rooms.filter((r) => {
     const matchSearch =
       r.room_number.toString().includes(search) ||
-      r.type.toLowerCase().includes(search.toLowerCase());
+      r.type?.toLowerCase().includes(search.toLowerCase());
 
     const matchGender =
       activeTab === 'all'
@@ -122,14 +114,13 @@ const Room = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Rooms</h1>
 
-        {/* ✅ FINAL BLUE BUTTON */}
         <Button
-        onClick={openCreate}
-        variant="custom"
-        className="bg-blue-600 hover:bg-blue-700 text-white"
+          onClick={openCreate}
+          variant="custom"
+          className="bg-blue-600 hover:bg-blue-700 text-white"
         >
-       <Plus size={16}/> Add Room
-       </Button>
+          <Plus size={16}/> Add Room
+        </Button>
       </div>
 
       {/* FILTER */}
@@ -138,10 +129,10 @@ const Room = () => {
           <button
             key={tab}
             onClick={()=>setActiveTab(tab)}
-            className={`px-4 py-1 rounded-lg text-sm transition ${
+            className={`px-4 py-1 rounded-lg text-sm ${
               activeTab===tab
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                : 'bg-slate-800 text-slate-300'
             }`}
           >
             {tab==='all' ? 'All' : tab==='boys' ? '👦 Boys' : '👧 Girls'}
@@ -154,7 +145,7 @@ const Room = () => {
         value={search}
         onChange={(e)=>setSearch(e.target.value)}
         placeholder="Search rooms..."
-        className="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg w-full max-w-xs text-white focus:ring-2 focus:ring-blue-500 outline-none"
+        className="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg w-full max-w-xs text-white"
       />
 
       {/* CARDS */}
@@ -166,37 +157,69 @@ const Room = () => {
           {filtered.map(room => (
             <div
               key={room.id}
-              className="bg-[#0f172a] border border-slate-800 rounded-xl p-4 shadow hover:shadow-lg hover:scale-[1.02] transition"
+              className="
+                bg-[#0f172a]
+                border border-slate-800
+                rounded-xl p-4
+                relative group
+                transition-all duration-300
+
+                hover:shadow-2xl
+                hover:shadow-blue-500/10
+                hover:-translate-y-2
+                hover:scale-[1.02]
+                hover:border-blue-500/40
+              "
             >
-              <div className="flex justify-between mb-2">
-                <h2 className="font-semibold text-sm text-white">
+              {/* HEADER */}
+              <div className="flex justify-between">
+                <h2 className="font-semibold text-sm">
                   Room {room.room_number}
                 </h2>
 
-                <span className={`text-xs px-2 py-0.5 rounded-full ${
-                  normalizeGender(room.gender) === 'boys'
-                    ? 'bg-blue-500/20 text-blue-400'
-                    : 'bg-pink-500/20 text-pink-400'
-                }`}>
+                <span className="text-xs">
                   {normalizeGender(room.gender) === 'boys' ? '👦' : '👧'}
                 </span>
               </div>
 
-              <div className="text-xs text-slate-400 flex justify-between">
+              {/* DETAILS */}
+              <div className="text-xs text-slate-400 flex justify-between mt-1">
                 <span>Floor {room.floor}</span>
                 <span>{room.capacity} Beds</span>
               </div>
 
-              <p className="text-lg font-bold mt-2 text-white">
+              <p className="text-lg font-bold mt-2">
                 ₹{room.price_per_month}
               </p>
+
+              {/* ACTION BUTTONS */}
+              <div className="flex justify-end gap-2 mt-3 opacity-0 group-hover:opacity-100 transition">
+
+                <button
+                  onClick={() => openEdit(room)}
+                  className="p-2 bg-blue-500/20 hover:bg-blue-500/40 rounded transition"
+                >
+                  <Pencil size={16} className="text-blue-400"/>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setDeleteId(room.id);
+                    setConfirm(true);
+                  }}
+                  className="p-2 bg-red-500/20 hover:bg-red-500/40 rounded transition"
+                >
+                  <Trash2 size={16} className="text-red-400"/>
+                </button>
+
+              </div>
             </div>
           ))}
 
         </div>
       )}
 
-      {/* ADD / EDIT MODAL */}
+      {/* MODAL */}
       <Modal isOpen={showModal} onClose={()=>setShowModal(false)} title="Room">
 
         <FormGroup label="Room Number">
@@ -204,7 +227,7 @@ const Room = () => {
             name="room_number"
             value={form.room_number}
             onChange={handleChange}
-            className="w-full bg-slate-800 px-3 py-2 rounded border border-slate-700 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full bg-slate-800 px-3 py-2 rounded border border-slate-700 text-white"
           />
         </FormGroup>
 
@@ -213,7 +236,7 @@ const Room = () => {
             name="capacity"
             value={form.capacity}
             onChange={handleChange}
-            className="w-full bg-slate-800 px-3 py-2 rounded border border-slate-700 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full bg-slate-800 px-3 py-2 rounded border border-slate-700 text-white"
           />
         </FormGroup>
 
@@ -222,7 +245,7 @@ const Room = () => {
             name="price_per_month"
             value={form.price_per_month}
             onChange={handleChange}
-            className="w-full bg-slate-800 px-3 py-2 rounded border border-slate-700 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full bg-slate-800 px-3 py-2 rounded border border-slate-700 text-white"
           />
         </FormGroup>
 
@@ -231,7 +254,7 @@ const Room = () => {
             name="gender"
             value={form.gender}
             onChange={handleChange}
-            className="w-full bg-slate-800 px-3 py-2 rounded border border-slate-700 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full bg-slate-800 px-3 py-2 rounded border border-slate-700 text-white"
           >
             <option value="">Select Gender</option>
             <option value="boys">Boys</option>

@@ -123,7 +123,8 @@ const Dashboard = () => {
       {/* TOP CHARTS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <div className="bg-[#0f172a] border border-slate-800 p-5 rounded-2xl shadow">
+        {/* Revenue */}
+        <div className="bg-[#0f172a] border border-slate-800 p-5 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
           <h2 className="font-semibold mb-3 text-slate-300">Revenue Analytics</h2>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={revenue}>
@@ -135,7 +136,8 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-[#0f172a] border border-slate-800 p-5 rounded-2xl shadow">
+        {/* Occupancy */}
+        <div className="bg-[#0f172a] border border-slate-800 p-5 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
           <h2 className="font-semibold mb-3 text-slate-300">Room Occupancy</h2>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
@@ -149,11 +151,13 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </div>
 
+        {/* Fees Status */}
+        <Chart title="Fees Status" data={statusData} colors={COLORS} />
+
       </div>
 
       {/* BOTTOM CHARTS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Chart title="Fees Status" data={statusData} colors={COLORS} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Chart title="Students Gender" data={genderData} colors={GENDER_COLORS} />
         <Chart title="Complaints Status" data={complaintData} colors={COMPLAINT_COLORS} />
       </div>
@@ -162,9 +166,7 @@ const Dashboard = () => {
   );
 };
 
-// DARK CARD
 const Card = ({ title, value, icon: Icon, color }) => {
-
   const styles = {
     blue: "from-blue-500 to-blue-600 bg-blue-500/10 text-blue-400",
     purple: "from-purple-500 to-purple-600 bg-purple-500/10 text-purple-400",
@@ -178,15 +180,12 @@ const Card = ({ title, value, icon: Icon, color }) => {
 
   return (
     <div className="bg-[#0f172a] border border-slate-800 rounded-2xl shadow-sm hover:shadow-lg hover:scale-[1.02] transition p-5 relative overflow-hidden">
-
       <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${gradFrom} ${gradTo}`} />
-
       <div className="flex justify-between items-center">
         <div>
           <p className="text-sm text-slate-400">{title}</p>
           <h2 className="text-2xl font-bold text-white">{value}</h2>
         </div>
-
         <div className={`p-3 rounded-xl ${bg}`}>
           <Icon className={text} size={22} />
         </div>
@@ -195,9 +194,8 @@ const Card = ({ title, value, icon: Icon, color }) => {
   );
 };
 
-// DARK CHART CARD
 const Chart = ({ title, data, colors }) => (
-  <div className="bg-[#0f172a] border border-slate-800 p-5 rounded-2xl shadow">
+  <div className="bg-[#0f172a] border border-slate-800 p-5 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
     <h2 className="font-semibold mb-3 text-center text-slate-300">{title}</h2>
     <ResponsiveContainer width="100%" height={260}>
       <PieChart>
