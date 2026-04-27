@@ -128,11 +128,11 @@ export default function Fees() {
         </div>
 
         <button
-          onClick={openAdd}
-          className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-2 rounded-xl shadow hover:opacity-90 transition"
+        onClick={openAdd}
+        className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-xl shadow transition text-white"
         >
-          + Add Fee
-        </button>
+        + Add Fee
+       </button>
       </div>
 
       {/* 🔥 DIVIDER */}

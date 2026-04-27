@@ -115,11 +115,8 @@ const createRoom = async (req, res) => {
       gender,
       amenities,
       description,
-
-      // ✅ NEW FIELDS
       total_fee,
-      paid_fee,
-      pending_fee
+      paid_fee
     } = req.body;
 
     if (!room_number || !capacity || !price_per_month || !gender) {
@@ -155,7 +152,7 @@ const createRoom = async (req, res) => {
         floor || 1,
         price_per_month,
         status || 'available',
-        gender.toLowerCase(),
+        gender.toLowerCase(), // ✅ FIX
         amenities || null,
         description || null,
         total,

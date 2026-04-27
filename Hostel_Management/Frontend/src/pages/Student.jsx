@@ -7,9 +7,11 @@ import {
 } from '../components/UI';
 
 const defaultForm = {
-  name: '', email: '', phone: '', address: '',
-  date_of_birth: '', id_proof_type: '', id_proof_number: '',
-  gender: 'Male', status: 'active',
+  name: '',
+  email: '',
+  phone: '',
+  gender: 'Male',
+  status: 'active',
 };
 
 const Student = () => {
@@ -19,16 +21,13 @@ const Student = () => {
   const [filterStatus, setFilter] = useState('');
 
   const [showModal, setShowModal] = useState(false);
-  const [showView, setShowView] = useState(false);
   const [showConfirm, setConfirm] = useState(false);
 
   const [editStudent, setEdit] = useState(null);
-  const [viewStudent, setView] = useState(null);
   const [form, setForm] = useState(defaultForm);
   const [deleteId, setDeleteId] = useState(null);
 
   const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
 
   const fetchStudents = async () => {
     try {
@@ -58,21 +57,8 @@ const Student = () => {
 
   const openEdit = (s) => {
     setEdit(s);
-    setForm({
-      ...s,
-      date_of_birth: s.date_of_birth?.split('T')[0] || ''
-    });
+    setForm(s);
     setShowModal(true);
-  };
-
-  const openView = async (s) => {
-    try {
-      const res = await studentAPI.getById(s.id);
-      setView(res.data);
-      setShowView(true);
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   const handleChange = (e) =>
@@ -98,15 +84,12 @@ const Student = () => {
   };
 
   const handleDelete = async () => {
-    setDeleting(true);
     try {
       await studentAPI.delete(deleteId);
       setConfirm(false);
       fetchStudents();
     } catch (err) {
       console.error(err);
-    } finally {
-      setDeleting(false);
     }
   };
 
@@ -120,7 +103,10 @@ const Student = () => {
           <p className="text-sm text-slate-400">Manage hostel residents</p>
         </div>
 
-        <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90">
+        <Button
+          onClick={openCreate}
+          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90"
+        >
           <Plus size={16} /> Add Student
         </Button>
       </div>
@@ -159,7 +145,6 @@ const Student = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-slate-300">
-
               <thead className="bg-slate-900 text-slate-400 text-xs uppercase">
                 <tr>
                   <th className="px-4 py-3 text-left">#</th>
@@ -174,83 +159,74 @@ const Student = () => {
 
               <tbody>
                 {students.map((s, i) => (
-                  <tr key={s.id} className="border-t border-slate-800 hover:bg-slate-800 transition">
-
+                  <tr key={s.id} className="border-t border-slate-800 hover:bg-slate-800">
                     <td className="px-4 py-3 text-slate-500">{i + 1}</td>
-
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-blue-500/20 rounded-full flex items-center justify-center font-bold text-blue-400">
-                          {s.name?.charAt(0)}
-                        </div>
-                        <div>
-                          <p className="font-medium text-white">{s.name}</p>
-                          <p className="text-xs text-slate-400">{s.email}</p>
-                        </div>
-                      </div>
-                    </td>
-
+                    <td className="px-4 py-3 text-white">{s.name}</td>
                     <td className="px-4 py-3">{s.email}</td>
-                    <td className="px-4 py-3">{s.phone || '-'}</td>
+                    <td className="px-4 py-3">{s.phone}</td>
                     <td className="px-4 py-3">{s.gender}</td>
-
                     <td className="px-4 py-3">
                       <Badge status={s.status} />
                     </td>
-
                     <td className="px-4 py-3">
-                      <div className="flex gap-2">
-
-                        <button
-                          onClick={() => openView(s)}
-                          className="p-2 rounded-lg hover:bg-blue-500/20 text-blue-400"
-                        >
-                          <Eye size={16} />
-                        </button>
-
-                        <button
-                          onClick={() => openEdit(s)}
-                          className="p-2 rounded-lg hover:bg-yellow-500/20 text-yellow-400"
-                        >
-                          <Pencil size={16} />
-                        </button>
-
-                        <button
-                          onClick={() => { setDeleteId(s.id); setConfirm(true); }}
-                          className="p-2 rounded-lg hover:bg-red-500/20 text-red-400"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-
-                      </div>
+                      <button onClick={() => openEdit(s)} className="text-yellow-400">✏️</button>
+                      <button onClick={() => { setDeleteId(s.id); setConfirm(true); }} className="text-red-400 ml-2">🗑️</button>
                     </td>
-
                   </tr>
                 ))}
               </tbody>
-
             </table>
           </div>
         )}
       </div>
 
       {/* MODAL */}
-      <Modal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        title={editStudent ? 'Edit Student' : 'Add Student'}
-      >
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Add Student">
+
         <FormRow>
           <FormGroup label="Full Name">
-            <Input className="bg-slate-800 text-white" name="name" value={form.name} onChange={handleChange} />
+            <Input className="bg-white !text-black border" name="name" value={form.name} onChange={handleChange} />
           </FormGroup>
 
           <FormGroup label="Email">
-            <Input className="bg-slate-800 text-white" name="email" value={form.email} onChange={handleChange} />
+            <Input className="bg-white !text-black border" name="email" value={form.email} onChange={handleChange} />
           </FormGroup>
         </FormRow>
 
-        <Button onClick={handleSave}>{saving ? "Saving..." : "Save"}</Button>
+        <FormRow>
+          <FormGroup label="Phone">
+            <Input className="bg-white !text-black border" name="phone" value={form.phone} onChange={handleChange} />
+          </FormGroup>
+
+          <FormGroup label="Gender">
+            <Select
+              className="bg-white !text-black border"
+              name="gender"
+              value={form.gender}
+              onChange={handleChange}
+            >
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </Select>
+          </FormGroup>
+        </FormRow>
+
+        <FormGroup label="Status">
+          <Select
+            className="bg-white !text-black border"
+            name="status"
+            value={form.status}
+            onChange={handleChange}
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </Select>
+        </FormGroup>
+
+        <Button onClick={handleSave}>
+          {saving ? "Saving..." : "Save"}
+        </Button>
+
       </Modal>
 
       <ConfirmDialog

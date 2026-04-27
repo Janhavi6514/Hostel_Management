@@ -241,31 +241,59 @@ const StaffAndNotice = () => {
       )}
 
       {/* STAFF MODAL (kept using your Modal) */}
-      <Modal isOpen={showStaff} onClose={()=>setShowStaff(false)}>
-        <div className="bg-[#0f172a] p-6 rounded-2xl text-white w-[400px]">
-          <h2 className="text-lg font-semibold mb-3">
-            {editStaff ? "Edit Staff" : "Add Staff"}
-          </h2>
+      {/* STAFF MODAL */}
+<Modal
+  isOpen={showStaff}
+  onClose={() => setShowStaff(false)}
+  title={editStaff ? "Edit Staff" : "Add Staff"}
+>
 
-          <Input placeholder="Name" value={staffForm.name} onChange={(e)=>setStaffForm({...staffForm,name:e.target.value})}/>
-          <Input placeholder="Email" value={staffForm.email} onChange={(e)=>setStaffForm({...staffForm,email:e.target.value})}/>
-          <Input placeholder="Phone" value={staffForm.phone} onChange={(e)=>setStaffForm({...staffForm,phone:e.target.value})}/>
-          <Input placeholder="Role" value={staffForm.role} onChange={(e)=>setStaffForm({...staffForm,role:e.target.value})}/>
+  <input
+    placeholder="Name"
+    value={staffForm.name}
+    onChange={(e)=>setStaffForm({...staffForm,name:e.target.value})}
+    className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 outline-none"
+  />
 
-          <Select value={staffForm.shift} onChange={(e)=>setStaffForm({...staffForm,shift:e.target.value})}>
-            <option>Morning</option>
-            <option>Evening</option>
-            <option>Night</option>
-          </Select>
+  <input
+    placeholder="Email"
+    value={staffForm.email}
+    onChange={(e)=>setStaffForm({...staffForm,email:e.target.value})}
+    className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 outline-none"
+  />
 
-          <button
-            onClick={handleStaffSave}
-            className="w-full mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 py-2 rounded-lg"
-          >
-            {editStaff ? "Update Staff" : "Add Staff"}
-          </button>
-        </div>
-      </Modal>
+  <input
+    placeholder="Phone"
+    value={staffForm.phone}
+    onChange={(e)=>setStaffForm({...staffForm,phone:e.target.value})}
+    className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 outline-none"
+  />
+
+  <input
+    placeholder="Role"
+    value={staffForm.role}
+    onChange={(e)=>setStaffForm({...staffForm,role:e.target.value})}
+    className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 outline-none"
+  />
+
+  <select
+    value={staffForm.shift}
+    onChange={(e)=>setStaffForm({...staffForm,shift:e.target.value})}
+    className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+  >
+    <option>Morning</option>
+    <option>Evening</option>
+    <option>Night</option>
+  </select>
+
+  <button
+    onClick={handleStaffSave}
+    className="w-full mt-3 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90 transition font-medium"
+  >
+    {editStaff ? "Update Staff" : "Add Staff"}
+  </button>
+
+</Modal>
 
       {/* ✅ CUSTOM NOTICE MODAL (NO WHITE BACKGROUND) */}
       {showNotice && (

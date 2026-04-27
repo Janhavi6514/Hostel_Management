@@ -59,39 +59,37 @@ export const Badge = ({ status, label }) => {
 // ─────────────────────────────────────────
 // MODAL (FIXED - SMALL & CLEAN)
 // ─────────────────────────────────────────
-export const Modal = ({ isOpen, onClose, title, children, footer }) => {
+export const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md">
 
-      {/* SMALL MODAL */}
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 flex flex-col">
+      <div className="relative w-full max-w-md mx-4">
 
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-          <h2 className="text-sm font-semibold text-slate-800">{title}</h2>
+        {/* CARD */}
+        <div className="bg-gradient-to-br from-[#0f172a] to-[#020617] rounded-2xl shadow-2xl border border-slate-800 p-6">
+
+          {/* CLOSE */}
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+            className="absolute top-4 right-4 text-slate-400 hover:text-white transition"
           >
-            <X size={16} />
+            ✕
           </button>
-        </div>
 
-        {/* Body */}
-        <div className="px-4 py-3 text-sm space-y-2">
-          {children}
-        </div>
+          {/* TITLE */}
+          <h2 className="text-xl font-semibold text-white mb-5">
+            {title}
+          </h2>
 
-        {/* Footer */}
-        {footer && (
-          <div className="flex justify-end gap-2 px-4 py-3 border-t border-slate-100">
-            {footer}
+          {/* CONTENT */}
+          <div className="space-y-4">
+            {children}
           </div>
-        )}
-      </div>
 
+        </div>
+      </div>
     </div>
   );
 };
@@ -232,14 +230,22 @@ export const Select = ({ className = '', children, ...props }) => (
 // ─────────────────────────────────────────
 // BUTTON
 // ─────────────────────────────────────────
-export const Button = ({ variant = 'primary', size = 'md', className = '', children, ...props }) => {
+export const Button = ({
+  variant = 'primary',
+  size = 'md',
+  className = '',
+  children,
+  ...props
+}) => {
+
   const variants = {
-    primary:   'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800',
+    primary: 'bg-blue-600 text-white hover:bg-blue-700',
     secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200',
-    danger:    'bg-red-500 text-white hover:bg-red-600',
-    success:   'bg-green-500 text-white hover:bg-green-600',
-    ghost:     'text-slate-600 hover:bg-slate-100',
+    danger: 'bg-red-500 text-white hover:bg-red-600',
+    success: 'bg-green-500 text-white hover:bg-green-600',
+    ghost: 'text-slate-600 hover:bg-slate-100',
   };
+
   const sizes = {
     sm: 'px-3 py-1.5 text-xs',
     md: 'px-4 py-2 text-sm',
@@ -248,9 +254,13 @@ export const Button = ({ variant = 'primary', size = 'md', className = '', child
 
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-lg font-medium
-        transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed
-        ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`
+        inline-flex items-center justify-center gap-2 rounded-lg font-medium
+        transition-all duration-150
+        ${sizes[size]}
+        ${variant === 'custom' ? '' : variants[variant]}
+        ${className}
+      `}
       {...props}
     >
       {children}

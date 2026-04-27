@@ -107,11 +107,18 @@ const Complaint = () => {
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-white">Complaints</h1>
+          <h1 className="text-2xl font-bold">Complaints</h1>
           <p className="text-slate-400">Manage and track all complaints</p>
         </div>
 
-        <Button className="bg-gradient-to-r from-blue-600 to-indigo-600">
+        <Button
+          onClick={() => {
+            setEditId(null);
+            setForm(defaultForm);
+            setShowModal(true);
+          }}
+          className="bg-gradient-to-r from-blue-600 to-indigo-600"
+        >
           <Plus size={16} /> New
         </Button>
       </div>
@@ -168,53 +175,63 @@ const Complaint = () => {
           {filtered.map((c) => (
             <div
               key={c.id}
-              className={`relative group p-5 rounded-2xl bg-[#0f172a] border border-slate-800 shadow hover:shadow-xl transition
-                border-l-4
-                ${c.status === "open" && "border-l-yellow-400"}
-                ${c.status === "in_progress" && "border-l-blue-500"}
-                ${c.status === "resolved" && "border-l-green-500"}
-              `}
+              className="relative group rounded-2xl p-5 
+              bg-gradient-to-br from-[#0f172a] to-[#020617] 
+              border border-slate-800 
+              shadow-lg hover:shadow-blue-500/10 
+              transition-all duration-300 hover:scale-[1.02]"
             >
 
-              <div className="flex justify-between mb-3">
+              {/* 🔥 FIX: pointer-events-none */}
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 border border-blue-500/20 blur-sm transition pointer-events-none" />
+
+              {/* Header */}
+              <div className="flex justify-between mb-3 relative z-10">
                 <div>
-                  <h3 className="text-lg font-semibold text-white">
-                    {c.student_name}
-                  </h3>
+                  <h3 className="text-white font-semibold">{c.student_name}</h3>
                   <p className="text-xs text-slate-400">{c.category}</p>
                 </div>
 
-                <span className={`px-3 py-1 text-xs rounded-full capitalize
-                  ${c.status === "open" && "bg-yellow-500/20 text-yellow-400"}
-                  ${c.status === "in_progress" && "bg-blue-500/20 text-blue-400"}
-                  ${c.status === "resolved" && "bg-green-500/20 text-green-400"}
-                `}>
+                <span
+                  className={`px-2 py-1 text-xs rounded-full ${
+                    c.status === "open"
+                      ? "bg-yellow-500/20 text-yellow-400"
+                      : c.status === "in_progress"
+                      ? "bg-blue-500/20 text-blue-400"
+                      : "bg-green-500/20 text-green-400"
+                  }`}
+                >
                   {c.status.replace("_", " ")}
                 </span>
               </div>
 
-              <h4 className="text-slate-200">{c.subject}</h4>
+              {/* Content */}
+              <p className="text-white font-medium relative z-10">
+                {c.subject}
+              </p>
 
-              <p className="text-sm text-slate-400 mt-1 mb-4 line-clamp-2">
+              <p className="text-sm text-slate-400 mb-4 relative z-10">
                 {c.description}
               </p>
 
-              <div className="flex justify-between items-center">
+              {/* Footer */}
+              <div className="flex justify-between items-center relative z-10">
 
                 <select
                   value={c.status}
                   onChange={(e) => updateStatus(c.id, e.target.value)}
-                  className="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-sm"
+                  className="bg-slate-800 text-white px-2 py-1 rounded text-sm"
                 >
                   <option value="open">Open</option>
                   <option value="in_progress">In Progress</option>
                   <option value="resolved">Resolved</option>
                 </select>
 
+                {/* ✅ FIXED BUTTONS */}
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEdit(c)}
-                    className="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:scale-110"
+                    className="text-blue-400 hover:scale-110 transition"
                   >
                     <Pencil size={16} />
                   </button>
@@ -224,11 +241,12 @@ const Complaint = () => {
                       setDeleteId(c.id);
                       setConfirm(true);
                     }}
-                    className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:scale-110"
+                    className="text-red-400 hover:scale-110 transition"
                   >
                     <Trash2 size={16} />
                   </button>
                 </div>
+
               </div>
 
             </div>
@@ -237,13 +255,15 @@ const Complaint = () => {
       )}
 
       {/* MODAL */}
-      <Modal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        title={editId ? "Edit Complaint" : "New Complaint"}
-      >
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Complaint">
+
         <FormGroup label="Student">
-          <Select name="student_id" value={form.student_id} onChange={handleChange}>
+          <Select
+            className="bg-white !text-black border"
+            name="student_id"
+            value={form.student_id}
+            onChange={handleChange}
+          >
             <option value="">Select</option>
             {students.map(s => (
               <option key={s.id} value={s.id}>{s.name}</option>
@@ -252,7 +272,12 @@ const Complaint = () => {
         </FormGroup>
 
         <FormGroup label="Subject">
-          <Input className="bg-slate-800 text-white" name="subject" value={form.subject} onChange={handleChange} />
+          <Input
+            className="bg-white !text-black border"
+            name="subject"
+            value={form.subject}
+            onChange={handleChange}
+          />
         </FormGroup>
 
         <FormGroup label="Description">
@@ -260,13 +285,14 @@ const Complaint = () => {
             name="description"
             value={form.description}
             onChange={handleChange}
-            className="w-full bg-slate-800 border border-slate-700 p-2 rounded text-white"
+            className="w-full bg-white !text-black border p-2 rounded"
           />
         </FormGroup>
 
         <Button onClick={handleSave}>
           {editId ? "Update" : "Submit"}
         </Button>
+
       </Modal>
 
       <ConfirmDialog

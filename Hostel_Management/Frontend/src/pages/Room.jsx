@@ -3,7 +3,7 @@ import { Plus, BedDouble } from 'lucide-react';
 import { roomAPI } from '../Utils/api';
 import {
   Modal, ConfirmDialog, Spinner,
-  EmptyState, FormGroup, Input, Select, Button,
+  EmptyState, FormGroup, Button,
 } from '../components/UI';
 
 const defaultForm = {
@@ -121,9 +121,15 @@ const Room = () => {
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Rooms</h1>
-        <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90">
-          <Plus size={16}/> Add Room
-        </Button>
+
+        {/* ✅ FINAL BLUE BUTTON */}
+        <Button
+        onClick={openCreate}
+        variant="custom"
+        className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+       <Plus size={16}/> Add Room
+       </Button>
       </div>
 
       {/* FILTER */}
@@ -184,70 +190,58 @@ const Room = () => {
               <p className="text-lg font-bold mt-2 text-white">
                 ₹{room.price_per_month}
               </p>
-
-              <div className="flex gap-2 mt-3">
-                <button
-                  onClick={()=>setSelectedRoom(room)}
-                  className="flex-1 bg-blue-500/20 text-blue-400 text-xs py-1 rounded hover:bg-blue-500/30"
-                >
-                  View
-                </button>
-
-                <button onClick={()=>openEdit(room)} className="text-slate-400 hover:text-white">✏️</button>
-
-                <button onClick={()=>{
-                  setDeleteId(room.id);
-                  setConfirm(true);
-                }} className="text-red-400 hover:text-red-300">
-                  🗑️
-                </button>
-              </div>
             </div>
           ))}
 
         </div>
       )}
 
-      {/* VIEW MODAL */}
-      <Modal isOpen={!!selectedRoom} onClose={()=>setSelectedRoom(null)} title="Room Details">
-        {selectedRoom && (
-          <div className="space-y-2 text-sm text-slate-300">
-            <p><b>Room:</b> {selectedRoom.room_number}</p>
-            <p><b>Type:</b> {selectedRoom.type}</p>
-            <p><b>Floor:</b> {selectedRoom.floor}</p>
-            <p><b>Capacity:</b> {selectedRoom.capacity}</p>
-            <p><b>Gender:</b> {selectedRoom.gender}</p>
-            <p><b>Price:</b> ₹{selectedRoom.price_per_month}</p>
-            <p><b>Amenities:</b> {selectedRoom.amenities || 'None'}</p>
-            <p><b>Description:</b> {selectedRoom.description || 'None'}</p>
-          </div>
-        )}
-      </Modal>
-
-      {/* ADD / EDIT */}
+      {/* ADD / EDIT MODAL */}
       <Modal isOpen={showModal} onClose={()=>setShowModal(false)} title="Room">
 
         <FormGroup label="Room Number">
-          <Input className="bg-slate-800 text-white" name="room_number" value={form.room_number} onChange={handleChange}/>
+          <input
+            name="room_number"
+            value={form.room_number}
+            onChange={handleChange}
+            className="w-full bg-slate-800 px-3 py-2 rounded border border-slate-700 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+          />
         </FormGroup>
 
         <FormGroup label="Capacity">
-          <Input className="bg-slate-800 text-white" type="number" name="capacity" value={form.capacity} onChange={handleChange}/>
+          <input
+            name="capacity"
+            value={form.capacity}
+            onChange={handleChange}
+            className="w-full bg-slate-800 px-3 py-2 rounded border border-slate-700 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+          />
         </FormGroup>
 
         <FormGroup label="Price">
-          <Input className="bg-slate-800 text-white" type="number" name="price_per_month" value={form.price_per_month} onChange={handleChange}/>
+          <input
+            name="price_per_month"
+            value={form.price_per_month}
+            onChange={handleChange}
+            className="w-full bg-slate-800 px-3 py-2 rounded border border-slate-700 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+          />
         </FormGroup>
 
         <FormGroup label="Gender">
-          <Select className="bg-slate-800 text-white" name="gender" value={form.gender} onChange={handleChange}>
+          <select
+            name="gender"
+            value={form.gender}
+            onChange={handleChange}
+            className="w-full bg-slate-800 px-3 py-2 rounded border border-slate-700 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+          >
             <option value="">Select Gender</option>
             <option value="boys">Boys</option>
             <option value="girls">Girls</option>
-          </Select>
+          </select>
         </FormGroup>
 
-        <Button onClick={handleSave}>Save</Button>
+        <Button onClick={handleSave} className="mt-3 bg-blue-600 hover:bg-blue-700 text-white">
+          Save
+        </Button>
 
       </Modal>
 
