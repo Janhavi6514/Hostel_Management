@@ -1,9 +1,3 @@
--- Create database (run this separately if needed)
--- CREATE DATABASE hostel_management2;
-
--- Use the database
--- \c hostel_management;
-
 -- Students table
 CREATE TABLE IF NOT EXISTS students (
   id INT AUTO_INCREMENT PRIMARY KEY,

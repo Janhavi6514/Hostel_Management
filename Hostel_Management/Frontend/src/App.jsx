@@ -12,9 +12,6 @@ import Fees from './pages/Fees';
 import Complaint from './pages/Complaint';
 import StaffAndNotice from './pages/StaffAndNotice';
 
-// ─────────────────────────────────────────
-// PROTECTED ROUTE
-// ─────────────────────────────────────────
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -51,9 +48,7 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
-// ─────────────────────────────────────────
-// APP ROUTES
-// ─────────────────────────────────────────
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -133,9 +128,7 @@ const AppRoutes = () => {
   );
 };
 
-// ─────────────────────────────────────────
-// ROOT APP
-// ─────────────────────────────────────────
+
 const App = () => {
   return (
     <BrowserRouter>

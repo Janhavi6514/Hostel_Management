@@ -60,7 +60,7 @@ const getSummary = async (req, res) => {
 };
 
 // ==============================
-// ✅ FIXED MONTHLY REVENUE (IMPORTANT)
+// MONTHLY REVENUE (IMPORTANT)
 // ==============================
 const getMonthlyRevenue = async (req, res) => {
   console.log("Revenue API HIT");
@@ -98,7 +98,7 @@ const getMonthlyRevenue = async (req, res) => {
 };
 
 // ==============================
-// ✅ FIXED ROOM OCCUPANCY
+// ROOM OCCUPANCY
 // ==============================
 const getRoomOccupancy = async (req, res) => {
   try {
@@ -168,7 +168,6 @@ const getComplaintStats = async (req, res) => {
   }
 };
 
-// ==============================
 module.exports = {
   getSummary,
   getMonthlyRevenue,

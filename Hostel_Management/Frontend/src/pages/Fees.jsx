@@ -116,7 +116,7 @@ export default function Fees() {
   return (
     <div className="space-y-6 text-white">
 
-      {/* 🔥 HEADER FIXED */}
+      {/* HEADER*/}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2 text-white">
@@ -135,10 +135,10 @@ export default function Fees() {
        </button>
       </div>
 
-      {/* 🔥 DIVIDER */}
+      {/*DIVIDER */}
       <div className="h-px bg-slate-800 w-full"></div>
 
-      {/* 🔥 SEARCH FIXED */}
+      {/*SEARCH FIXED */}
       <input
         value={search}
         onChange={e => setSearch(e.target.value)}

@@ -185,8 +185,6 @@ const updateRoom = async (req, res) => {
       gender,
       amenities,
       description,
-
-      // ✅ NEW
       total_fee,
       paid_fee
     } = req.body;
@@ -261,7 +259,7 @@ const deleteRoom = async (req, res) => {
   }
 };
 
-// ALLOCATE ROOM (UNCHANGED)
+// ALLOCATE ROOM
 const allocateRoom = async (req, res) => {
   try {
     const { student_id, room_id, check_in, check_out } = req.body;
@@ -394,7 +392,7 @@ module.exports = {
   getAllRooms,
   getRoomById,
   getRoomStudents,
-  getRoomsWithStudentsAndFees, // ✅ NEW EXPORT
+  getRoomsWithStudentsAndFees, 
   createRoom,
   updateRoom,
   deleteRoom,

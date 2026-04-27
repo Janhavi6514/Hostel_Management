@@ -31,7 +31,6 @@ export const AuthProvider = ({ children }) => {
       setToken(newToken);
       setUser(newUser);
 
-      // Persist to localStorage
       localStorage.setItem('token', newToken);
       localStorage.setItem('user', JSON.stringify(newUser));
 
@@ -43,7 +42,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout function
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -72,7 +70,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook for easy access
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

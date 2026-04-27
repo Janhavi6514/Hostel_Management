@@ -144,9 +144,6 @@ const Home = () => {
 export default Home;
 
 
-
-
-
 /* ================= STAT CARD ================= */
 const StatCard = ({ title, value, icon, gradient }) => {
   return (
@@ -168,9 +165,6 @@ const StatCard = ({ title, value, icon, gradient }) => {
     </div>
   );
 };
-
-
-
 
 
 /* ================= ACTION CARD ================= */

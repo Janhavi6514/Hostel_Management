@@ -182,7 +182,7 @@ const Complaint = () => {
               transition-all duration-300 hover:scale-[1.02]"
             >
 
-              {/* 🔥 FIX: pointer-events-none */}
+              {/*pointer-events-none */}
               <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 border border-blue-500/20 blur-sm transition pointer-events-none" />
 
               {/* Header */}
@@ -227,7 +227,7 @@ const Complaint = () => {
                   <option value="resolved">Resolved</option>
                 </select>
 
-                {/* ✅ FIXED BUTTONS */}
+                {/*FIXED BUTTONS */}
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEdit(c)}

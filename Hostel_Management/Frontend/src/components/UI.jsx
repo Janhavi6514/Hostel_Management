@@ -1,6 +1,7 @@
 import { X, AlertTriangle, Loader2 } from 'lucide-react';
 import React from 'react';
 
+
 // ─────────────────────────────────────────
 // SPINNER
 // ─────────────────────────────────────────
@@ -12,6 +13,7 @@ export const Spinner = ({ size = 20, className = '' }) => (
     />
   </div>
 );
+
 
 // ─────────────────────────────────────────
 // BADGE
@@ -53,11 +55,9 @@ export const Badge = ({ status, label }) => {
   );
 };
 
+
 // ─────────────────────────────────────────
 // MODAL
-// ─────────────────────────────────────────
-// ─────────────────────────────────────────
-// MODAL (FIXED - SMALL & CLEAN)
 // ─────────────────────────────────────────
 export const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
@@ -93,6 +93,7 @@ export const Modal = ({ isOpen, onClose, title, children }) => {
     </div>
   );
 };
+
 
 // ─────────────────────────────────────────
 // CONFIRM DIALOG
@@ -133,6 +134,7 @@ export const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, conf
   );
 };
 
+
 // ─────────────────────────────────────────
 // EMPTY STATE
 // ─────────────────────────────────────────
@@ -142,6 +144,7 @@ export const EmptyState = ({ icon: Icon, message = 'No records found' }) => (
     <p className="text-sm">{message}</p>
   </div>
 );
+
 
 // ─────────────────────────────────────────
 // STAT CARD
@@ -156,12 +159,11 @@ export const StatCard = ({ title, value, icon, color = 'blue', change, subtitle 
   };
   const c = colorMap[color] || colorMap.blue;
 
-  // Support both: icon={TrendingUp} and icon={<TrendingUp />}
   const renderIcon = () => {
   if (!icon) return null;
-  // If it's already a rendered JSX element like <TrendingUp />
+  
   if (React.isValidElement(icon)) return icon;
-  // Otherwise it's a component reference (function or forwardRef icon)
+  
   const Icon = icon;
   return <Icon className={`w-6 h-6 ${c.icon}`} />;
 };
@@ -182,12 +184,14 @@ export const StatCard = ({ title, value, icon, color = 'blue', change, subtitle 
   );
 };
 
+
 // ─────────────────────────────────────────
 // FORM ROW (2 columns)
 // ─────────────────────────────────────────
 export const FormRow = ({ children }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>
 );
+
 
 // ─────────────────────────────────────────
 // FORM GROUP
@@ -201,6 +205,7 @@ export const FormGroup = ({ label, children, required }) => (
   </div>
 );
 
+
 // ─────────────────────────────────────────
 // INPUT
 // ─────────────────────────────────────────
@@ -212,6 +217,7 @@ export const Input = ({ className = '', ...props }) => (
     {...props}
   />
 );
+
 
 // ─────────────────────────────────────────
 // SELECT
@@ -226,6 +232,7 @@ export const Select = ({ className = '', children, ...props }) => (
     {children}
   </select>
 );
+
 
 // ─────────────────────────────────────────
 // BUTTON
@@ -268,12 +275,6 @@ export const Button = ({
   );
 };
 
-// ... your existing components above ...
-
-// ✅ Make sure the last existing component closes properly like this:
-//  // ← closing of whichever component was last (e.g. StatCard)
-
-// ✅ Then the new components start fresh below:
 export const Card = ({ children, className = '' }) => (
   <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
     {children}

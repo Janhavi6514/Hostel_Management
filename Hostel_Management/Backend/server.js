@@ -9,24 +9,19 @@ const routes = require('./routes/index');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ─────────────────────────────────────────
-// MIDDLEWARE
-// ─────────────────────────────────────────
 
 // Security headers
 app.use(helmet());
 
-// ✅ FIXED CORS (IMPORTANT)
 app.use(
   cors({
     origin: process.env.CLIENT_URL || 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // 🔥 PATCH ADDED
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], 
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   })
 );
 
-// ✅ HANDLE PREFLIGHT REQUESTS (VERY IMPORTANT FOR PATCH)
 app.options('*', cors());
 
 // Request logging (dev mode)
@@ -34,15 +29,10 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 
-// Parse JSON and URL-encoded bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ─────────────────────────────────────────
-// ROUTES
-// ─────────────────────────────────────────
 
-// Health check (public)
 app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
@@ -51,12 +41,8 @@ app.get('/health', (req, res) => {
   });
 });
 
-// All API routes prefixed with /api
 app.use('/api', routes);
 
-// ─────────────────────────────────────────
-// 404 HANDLER
-// ─────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({ message: `Route ${req.originalUrl} not found` });
 });

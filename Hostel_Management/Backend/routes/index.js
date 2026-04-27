@@ -58,7 +58,7 @@ const {
   deleteNotice,
   getAllComplaints,
   createComplaint,
-  updateComplaint,              // ✅ ADDED
+  updateComplaint,              
   updateComplaintStatus,
   deleteComplaint,
 } = require('../Controllers/miscController');
@@ -136,7 +136,6 @@ router.delete('/notices/:id', verifyToken, isAdmin, deleteNotice);
 router.get('/complaints', verifyToken, getAllComplaints);
 router.post('/complaints', verifyToken, createComplaint);
 
-// 🔥 USE PATCH (more reliable)
 router.patch('/complaints/:id', verifyToken, updateComplaint);
 
 // status

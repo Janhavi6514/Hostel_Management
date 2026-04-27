@@ -240,7 +240,6 @@ const StaffAndNotice = () => {
         </div>
       )}
 
-      {/* STAFF MODAL (kept using your Modal) */}
       {/* STAFF MODAL */}
 <Modal
   isOpen={showStaff}
@@ -295,7 +294,7 @@ const StaffAndNotice = () => {
 
 </Modal>
 
-      {/* ✅ CUSTOM NOTICE MODAL (NO WHITE BACKGROUND) */}
+      {/*CUSTOM NOTICE MODAL */}
       {showNotice && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
 

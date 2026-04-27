@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-// Verify JWT token middleware
 const verifyToken = (req, res, next) => {
   try {
     const authHeader = req.headers['authorization'];
@@ -10,7 +9,6 @@ const verifyToken = (req, res, next) => {
       return res.status(401).json({ message: 'No token provided. Access denied.' });
     }
 
-    // Support "Bearer <token>" format
     const token = authHeader.startsWith('Bearer ')
       ? authHeader.slice(7)
       : authHeader;

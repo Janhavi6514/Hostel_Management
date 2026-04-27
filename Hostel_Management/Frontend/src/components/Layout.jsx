@@ -101,7 +101,7 @@ const Layout = ({ children }) => {
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-[#020617] via-[#020617] to-[#0f172a] text-white overflow-hidden">
 
-      {/* 🔥 PREMIUM HEADER */}
+      {/*HEADER */}
       <header className="relative h-16 flex items-center justify-between px-4 md:px-6 
       bg-gradient-to-r from-[#0f172a] via-[#020617] to-[#0f172a] 
       border-b border-slate-800 backdrop-blur-lg shadow-sm">
@@ -155,7 +155,6 @@ const Layout = ({ children }) => {
 
       </header>
 
-      {/* BODY */}
       <div className="flex flex-1 overflow-hidden">
 
         {/* SIDEBAR */}
