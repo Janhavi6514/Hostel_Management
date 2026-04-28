@@ -68,7 +68,7 @@ const getRoomStudents = async (req, res) => {
   }
 };
 
-// 🔥 NEW: ROOMS WITH STUDENTS + FEES
+// ROOMS WITH STUDENTS + FEES
 const getRoomsWithStudentsAndFees = async (req, res) => {
   try {
     const [rooms] = await db.query(`SELECT * FROM rooms`);
@@ -152,7 +152,7 @@ const createRoom = async (req, res) => {
         floor || 1,
         price_per_month,
         status || 'available',
-        gender.toLowerCase(), // ✅ FIX
+        gender.toLowerCase(), 
         amenities || null,
         description || null,
         total,

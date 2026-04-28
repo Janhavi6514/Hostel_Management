@@ -116,17 +116,15 @@ export const noticeAPI = {
   delete: (id) => api.delete(`/notices/${id}`),
 };
 
+
 // ─────────────────────────────────────────
-// COMPLAINTS ✅ FIXED
-// ─────────────────────────────────────────
-// ─────────────────────────────────────────
-// COMPLAINTS ✅ FINAL
+// COMPLAINTS 
 // ─────────────────────────────────────────
 export const complaintAPI = {
   getAll: (params) => api.get('/complaints', { params }),
   create: (data) => api.post('/complaints', data),
 
-  // 🔥 MATCH PATCH ROUTE
+  // MATCH PATCH ROUTE
   update: (id, data) => api.patch(`/complaints/${id}`, data),
 
   updateStatus: (id, data) => api.put(`/complaints/${id}/status`, data),
